@@ -1,23 +1,19 @@
 import sharp from "sharp";
-import fs from "fs";
 
 /**
  * Optimize image before upload
- * @param {string} filePath - Path to the image file
+ * @param {Buffer} fileBuffer - Image file buffer
  * @param {object} options - Resize & quality options
- * @returns {Promise<string>} - Path to optimized image
+ * @returns {Promise<Buffer>} - Optimized image buffer
  */
-export const optimizeImage = async (filePath, options = {}) => {
+export const optimizeImage = async (fileBuffer, options = {}) => {
   const { width = 800, height = null, quality = 80 } = options;
 
-  const optimizedPath = filePath.replace(/(\.[\w]+)$/, "_optimized$1");
-
-  await sharp(filePath)
+  // Optimize the image buffer
+  const optimizedBuffer = await sharp(fileBuffer)
     .resize(width, height, { fit: "inside", withoutEnlargement: true })
     .jpeg({ quality, progressive: true })
-    .toFile(optimizedPath);
+    .toBuffer(); // Return the optimized image buffer
 
-  fs.unlinkSync(filePath); // Remove original file to save space
-
-  return optimizedPath;
+  return optimizedBuffer;
 };

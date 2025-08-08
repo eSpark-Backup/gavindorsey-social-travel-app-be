@@ -1,13 +1,15 @@
 import { prisma } from "../prisma.js";
 import { CustomError } from "../utils/custom_error.js";
 import { uploadImage, deleteImage } from "../services/cloudinary.service.js";
+import { optimizeImage } from "../utils/imageOptimizer.js";
 
 export const createTrip = async (userId, createdBy, data, fileBuffer) => {
   let imageUrl = null;
   let publicId = null;
 
   if (fileBuffer) {
-    const uploaded = await uploadImage(fileBuffer, "trips");
+    const optimizedBuffer = await optimizeImage(fileBuffer);
+    const uploaded = await uploadImage(optimizedBuffer, "trips");
     imageUrl = uploaded.url;
     publicId = uploaded.public_id;
   }
@@ -42,36 +44,51 @@ export const getTrips = async (userId) => {
   return { data: trips };
 };
 
+
+
+
+
+
 export const getTripById = async (userId, tripId) => {
   const trip = await prisma.trip.findFirst({
     where: { id: tripId, userId },
     include: { days: true },
   });
-  if (!trip) throw new CustomError(404, "Trip not found");
+  if (!trip) throw new CustomError("Trip not found", 404);
   return { data: trip };
 };
 
-export const updateTrip = async (
-  userId,
-  tripId,
-  data,
-  fileBuffer,
-  oldPublicId
-) => {
+export const updateTrip = async (userId, tripId, data, fileBuffer) => {
   let imageUrl = data.imageUrl || null;
   let publicId = data.publicId || null;
 
+  // If a new image is provided, handle image replacement
   if (fileBuffer) {
-    if (oldPublicId) {
-      await deleteImage(oldPublicId);
+    const optimizedBuffer = await optimizeImage(fileBuffer);
+    // Retrieve the current image's publicId from the database
+    const currentTrip = await prisma.trip.findUnique({
+      where: { id: tripId },
+    });
+
+    // If a current image exists, delete it before uploading the new one
+    if (currentTrip?.publicId) {
+      try {
+        await deleteImage(currentTrip.publicId);
+      } catch (error) {
+        console.error("Error deleting old image:", error);
+        // Optionally, you could decide whether to throw or continue with the new upload
+      }
     }
-    const uploaded = await uploadImage(fileBuffer, "trips");
+
+    // Upload the new image and get the URL and public ID
+    const uploaded = await uploadImage(optimizedBuffer, "trips");
     imageUrl = uploaded.url;
     publicId = uploaded.public_id;
   }
 
   const { days, ...tripData } = data;
 
+  // Update the trip with the new image URL and public ID
   const updatedTripCount = await prisma.trip.updateMany({
     where: { id: tripId, userId },
     data: {
@@ -85,6 +102,7 @@ export const updateTrip = async (
     throw new CustomError("Trip not found", 404);
   }
 
+  // Update the days if provided
   if (days) {
     await prisma.day.deleteMany({ where: { tripId } });
     await prisma.day.createMany({
@@ -97,6 +115,7 @@ export const updateTrip = async (
     });
   }
 
+  // Fetch the updated trip
   const updatedTrip = await prisma.trip.findUnique({
     where: { id: tripId },
     include: { days: true },
@@ -104,6 +123,7 @@ export const updateTrip = async (
 
   return { data: updatedTrip };
 };
+
 
 export const deleteTrip = async (userId, tripId) => {
   const trip = await prisma.trip.findFirst({

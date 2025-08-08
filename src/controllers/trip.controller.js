@@ -37,6 +37,13 @@ const list = asyncWrapper(async (req, res) => {
   response.success(res, trips.data, "Trips fetched successfully");
 });
 
+
+
+
+
+
+
+
 const getById = asyncWrapper(async (req, res) => {
   const { trip_id } = req.params;
   const trip = await getTripById(req.user.user_id, trip_id);
