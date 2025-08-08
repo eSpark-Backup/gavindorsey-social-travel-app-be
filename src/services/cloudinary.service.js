@@ -1,7 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 
 export const uploadImage = async (fileBuffer, folder = "uploads") => {
-  const result = await cloudinary.uploader.upload_stream(
+  await cloudinary.uploader.upload_stream(
     { folder },
     (error, result) => {
       if (error) throw error;

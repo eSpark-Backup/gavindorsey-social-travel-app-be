@@ -82,7 +82,7 @@ export const updateTrip = async (
   });
 
   if (!updatedTripCount.count) {
-    throw new CustomError(404, "Trip not found");
+    throw new CustomError("Trip not found", 404);
   }
 
   if (days) {
@@ -105,14 +105,29 @@ export const updateTrip = async (
   return { data: updatedTrip };
 };
 
-export const deleteTrip = async (userId, tripId, publicId) => {
-  if (publicId) {
-    await deleteImage(publicId);
-  }
-
-  const trip = await prisma.trip.deleteMany({
+export const deleteTrip = async (userId, tripId) => {
+  const trip = await prisma.trip.findFirst({
     where: { id: tripId, userId },
   });
-  if (!trip.count) throw new CustomError(404, "Trip not found");
+
+  if (!trip) {
+    throw new CustomError("Trip not found", 404);
+  }
+
+  // Delete image from Cloudinary if publicId exists
+  if (trip.publicId) {
+    await deleteImage(trip.publicId);
+  }
+
+  // Delete the trip record
+  const deleted = await prisma.trip.deleteMany({
+    where: { id: tripId, userId },
+  });
+
+  if (!deleted.count) {
+    throw new CustomError("Trip not found", 404);
+  }
+
   return { data: "Trip deleted successfully" };
 };
+

@@ -81,11 +81,12 @@ const update = asyncWrapper(async (req, res) => {
 
 const remove = asyncWrapper(async (req, res) => {
   const { trip_id } = req.params;
-  const { public_id } = req.body;
 
-  const result = await deleteTrip(req.user.user_id, trip_id, public_id);
+  const result = await deleteTrip(req.user.user_id, trip_id);
 
   response.success(res, result.data, "Trip deleted successfully");
 });
+
+
 
 export { create, list, getById, update, remove };

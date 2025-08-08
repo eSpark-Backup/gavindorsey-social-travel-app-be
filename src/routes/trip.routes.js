@@ -13,17 +13,25 @@ import {
 import { validate } from "../middlewares/validate.js";
 import { authenticate } from "../middlewares/auth.js";
 import { upload } from "../middlewares/upload.js";
+import { parseDaysMiddleware } from "../middlewares/parseDaysMiddleware.js";
 
 const router = express.Router();
 
 router.use(authenticate);
 
-router.post("/", upload.single("image"), validate(createTripSchema), create);
+router.post(
+  "/",
+  upload.single("image"),
+  parseDaysMiddleware,
+  validate(createTripSchema),
+  create
+);
 router.get("/", list);
 router.get("/:trip_id", getById);
 router.put(
   "/:trip_id",
   upload.single("image"),
+  parseDaysMiddleware,
   validate(updateTripSchema),
   update
 );

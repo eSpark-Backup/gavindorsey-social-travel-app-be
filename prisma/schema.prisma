@@ -25,6 +25,7 @@ model Trip {
   userId    String
   createdBy String
   imageUrl  String?
+  publicId  String?
   startDate DateTime
   endDate   DateTime
   location  String

@@ -39,6 +39,10 @@
  *               cost:
  *                 type: number
  *                 format: float
+ *           default:
+ *             - day_number: 5
+ *               notes: "my notes"
+ *               cost: 2500
  *     UpdateTrip:
  *       type: object
  *       properties:
@@ -71,4 +75,8 @@
  *               cost:
  *                 type: number
  *                 format: float
+ *           default:
+ *             - day_number: 3
+ *               notes: "my updated notes"
+ *               cost: 2800
  */
