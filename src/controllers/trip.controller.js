@@ -7,32 +7,27 @@ import {
 } from "../services/trip.service.js";
 import { asyncWrapper } from "../utils/async_wrapper.js";
 import * as response from "../utils/response.js";
-import { uploadImage, deleteImage } from "../services/cloudinary.service.js";
-import { optimizeImage } from "../utils/imageOptimizer.js";
 
 const create = asyncWrapper(async (req, res) => {
-  let image_url = null;
-  if (req.file) {
-    const optimizedPath = await optimizeImage(req.file.path);
-    const uploaded = await uploadImage(optimizedPath, "trips");
-    image_url = uploaded.url;
-  }
-
   const { start_date, end_date, location, budget, total_cost, days } = req.body;
 
-  const trip = await createTrip(req.user.user_id, req.user.user_id, {
-    imageUrl: image_url,
-    startDate: new Date(start_date),
-    endDate: new Date(end_date),
-    location,
-    budget,
-    totalCost: total_cost,
-    days: days?.map((d) => ({
-      dayNumber: d.day_number,
-      notes: d.notes,
-      cost: d.cost,
-    })),
-  });
+  const trip = await createTrip(
+    req.user.user_id,
+    req.user.user_id,
+    {
+      startDate: new Date(start_date),
+      endDate: new Date(end_date),
+      location,
+      budget,
+      totalCost: total_cost,
+      days: days?.map((d) => ({
+        dayNumber: d.day_number,
+        notes: d.notes,
+        cost: d.cost,
+      })),
+    },
+    req.file?.buffer
+  );
 
   response.success(res, trip.data, "Trip created successfully");
 });
@@ -50,42 +45,46 @@ const getById = asyncWrapper(async (req, res) => {
 
 const update = asyncWrapper(async (req, res) => {
   const { trip_id } = req.params;
-  let image_url = req.body.image_url || null;
-
-  if (req.file) {
-    if (req.body.old_public_id) {
-      await deleteImage(req.body.old_public_id);
-    }
-    const optimizedPath = await optimizeImage(req.file.path);
-    const uploaded = await uploadImage(optimizedPath, "trips");
-    image_url = uploaded.url;
-  }
-
-  const { start_date, end_date, location, budget, total_cost, days } = req.body;
-
-  const result = await updateTrip(req.user.user_id, trip_id, {
-    imageUrl: image_url,
-    startDate: new Date(start_date),
-    endDate: new Date(end_date),
+  const {
+    start_date,
+    end_date,
     location,
     budget,
-    totalCost: total_cost,
-    days: days?.map((d) => ({
-      dayNumber: d.day_number,
-      notes: d.notes,
-      cost: d.cost,
-    })),
-  });
+    total_cost,
+    days,
+    old_public_id,
+    image_url,
+  } = req.body;
+
+  const result = await updateTrip(
+    req.user.user_id,
+    trip_id,
+    {
+      imageUrl: image_url || null,
+      startDate: start_date ? new Date(start_date) : undefined,
+      endDate: end_date ? new Date(end_date) : undefined,
+      location,
+      budget,
+      totalCost: total_cost,
+      days: days?.map((d) => ({
+        dayNumber: d.day_number,
+        notes: d.notes,
+        cost: d.cost,
+      })),
+    },
+    req.file?.buffer,
+    old_public_id
+  );
 
   response.success(res, result.data, "Trip updated successfully");
 });
 
 const remove = asyncWrapper(async (req, res) => {
   const { trip_id } = req.params;
-  if (req.body.public_id) {
-    await deleteImage(req.body.public_id);
-  }
-  const result = await deleteTrip(req.user.user_id, trip_id);
+  const { public_id } = req.body;
+
+  const result = await deleteTrip(req.user.user_id, trip_id, public_id);
+
   response.success(res, result.data, "Trip deleted successfully");
 });
 

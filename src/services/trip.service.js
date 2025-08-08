@@ -1,7 +1,17 @@
 import { prisma } from "../prisma.js";
 import { CustomError } from "../utils/custom_error.js";
+import { uploadImage, deleteImage } from "../services/cloudinary.service.js";
 
-export const createTrip = async (userId, createdBy, data) => {
+export const createTrip = async (userId, createdBy, data, fileBuffer) => {
+  let imageUrl = null;
+  let publicId = null;
+
+  if (fileBuffer) {
+    const uploaded = await uploadImage(fileBuffer, "trips");
+    imageUrl = uploaded.url;
+    publicId = uploaded.public_id;
+  }
+
   const { days, ...tripData } = data;
 
   const trip = await prisma.trip.create({
@@ -9,6 +19,8 @@ export const createTrip = async (userId, createdBy, data) => {
       userId,
       createdBy,
       ...tripData,
+      imageUrl,
+      publicId,
       days: days
         ? {
             create: days,
@@ -17,6 +29,7 @@ export const createTrip = async (userId, createdBy, data) => {
     },
     include: { days: true },
   });
+
   return { data: trip };
 };
 
@@ -38,12 +51,34 @@ export const getTripById = async (userId, tripId) => {
   return { data: trip };
 };
 
-export const updateTrip = async (userId, tripId, data) => {
+export const updateTrip = async (
+  userId,
+  tripId,
+  data,
+  fileBuffer,
+  oldPublicId
+) => {
+  let imageUrl = data.imageUrl || null;
+  let publicId = data.publicId || null;
+
+  if (fileBuffer) {
+    if (oldPublicId) {
+      await deleteImage(oldPublicId);
+    }
+    const uploaded = await uploadImage(fileBuffer, "trips");
+    imageUrl = uploaded.url;
+    publicId = uploaded.public_id;
+  }
+
   const { days, ...tripData } = data;
 
   const updatedTripCount = await prisma.trip.updateMany({
     where: { id: tripId, userId },
-    data: tripData,
+    data: {
+      ...tripData,
+      imageUrl,
+      publicId,
+    },
   });
 
   if (!updatedTripCount.count) {
@@ -70,7 +105,11 @@ export const updateTrip = async (userId, tripId, data) => {
   return { data: updatedTrip };
 };
 
-export const deleteTrip = async (userId, tripId) => {
+export const deleteTrip = async (userId, tripId, publicId) => {
+  if (publicId) {
+    await deleteImage(publicId);
+  }
+
   const trip = await prisma.trip.deleteMany({
     where: { id: tripId, userId },
   });
