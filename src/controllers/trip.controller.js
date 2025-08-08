@@ -21,8 +21,8 @@ const create = asyncWrapper(async (req, res) => {
 
   const trip = await createTrip(req.user.user_id, req.user.user_id, {
     imageUrl: image_url,
-    startDate: start_date,
-    endDate: end_date,
+    startDate: new Date(start_date),
+    endDate: new Date(end_date),
     location,
     budget,
     totalCost: total_cost,
@@ -61,8 +61,8 @@ const update = asyncWrapper(async (req, res) => {
 
   const result = await updateTrip(req.user.user_id, trip_id, {
     imageUrl: image_url,
-    startDate: start_date,
-    endDate: end_date,
+    startDate: new Date(start_date),
+    endDate: new Date(end_date),
     location,
     budget,
     totalCost: total_cost,

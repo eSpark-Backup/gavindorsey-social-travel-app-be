@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import jwt from "jsonwebtoken";
 import { CustomError } from "../utils/custom_error.js";
 import { asyncWrapper } from "../utils/async_wrapper.js";

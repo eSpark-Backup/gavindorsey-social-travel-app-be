@@ -11,8 +11,11 @@ import {
   updateTripSchema,
 } from "../validators/trip.validator.js";
 import { validate } from "../middlewares/validate.js";
+import { authenticate } from "../middlewares/auth.js";
 
 const router = express.Router();
+
+router.use(authenticate);
 
 router.post("/", validate(createTripSchema), create);
 router.get("/", list);
