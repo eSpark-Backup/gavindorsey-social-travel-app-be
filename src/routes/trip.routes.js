@@ -12,15 +12,21 @@ import {
 } from "../validators/trip.validator.js";
 import { validate } from "../middlewares/validate.js";
 import { authenticate } from "../middlewares/auth.js";
+import { upload } from "../middlewares/upload.js";
 
 const router = express.Router();
 
 router.use(authenticate);
 
-router.post("/", validate(createTripSchema), create);
+router.post("/", upload.single("image"), validate(createTripSchema), create);
 router.get("/", list);
 router.get("/:trip_id", getById);
-router.put("/:trip_id", validate(updateTripSchema), update);
+router.put(
+  "/:trip_id",
+  upload.single("image"),
+  validate(updateTripSchema),
+  update
+);
 router.delete("/:trip_id", remove);
 
 export { router as tripRoutes };

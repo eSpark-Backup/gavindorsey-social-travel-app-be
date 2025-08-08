@@ -70,8 +70,6 @@ export const updateTrip = async (userId, tripId, data) => {
   return { data: updatedTrip };
 };
 
-
-
 export const deleteTrip = async (userId, tripId) => {
   const trip = await prisma.trip.deleteMany({
     where: { id: tripId, userId },

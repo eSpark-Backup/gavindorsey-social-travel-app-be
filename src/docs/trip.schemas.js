@@ -10,9 +10,9 @@
  *         - location
  *         - budget
  *       properties:
- *         image_url:
+ *         image:
  *           type: string
- *           format: uri
+ *           format: binary
  *         start_date:
  *           type: string
  *           format: date
@@ -42,9 +42,9 @@
  *     UpdateTrip:
  *       type: object
  *       properties:
- *         image_url:
+ *         image:
  *           type: string
- *           format: uri
+ *           format: binary
  *         start_date:
  *           type: string
  *           format: date
