@@ -5,8 +5,7 @@ import {
   updateTrip,
   deleteTrip,
 } from "../services/trip.service.js";
-import { asyncWrapper } from "../utils/asyncHandler.js";
-import { CustomError } from "../utils/custom_error.js";
+import { asyncWrapper } from "../utils/async_wrapper.js";
 import * as response from "../utils/response.js";
 
 const create = asyncWrapper(async (req, res) => {
