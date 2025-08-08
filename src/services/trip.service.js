@@ -11,7 +11,7 @@ export const createTrip = async (userId, createdBy, data) => {
       ...tripData,
       days: days
         ? {
-            create: days, // correctly wrap days array in `create`
+            create: days,
           }
         : undefined,
     },
@@ -39,13 +39,38 @@ export const getTripById = async (userId, tripId) => {
 };
 
 export const updateTrip = async (userId, tripId, data) => {
-  const trip = await prisma.trip.updateMany({
+  const { days, ...tripData } = data;
+
+  const updatedTripCount = await prisma.trip.updateMany({
     where: { id: tripId, userId },
-    data,
+    data: tripData,
   });
-  if (!trip.count) throw new CustomError(404, "Trip not found");
-  return { data: "Trip updated successfully" };
+
+  if (!updatedTripCount.count) {
+    throw new CustomError(404, "Trip not found");
+  }
+
+  if (days) {
+    await prisma.day.deleteMany({ where: { tripId } });
+    await prisma.day.createMany({
+      data: days.map((d) => ({
+        tripId,
+        dayNumber: d.dayNumber,
+        notes: d.notes,
+        cost: d.cost,
+      })),
+    });
+  }
+
+  const updatedTrip = await prisma.trip.findUnique({
+    where: { id: tripId },
+    include: { days: true },
+  });
+
+  return { data: updatedTrip };
 };
+
+
 
 export const deleteTrip = async (userId, tripId) => {
   const trip = await prisma.trip.deleteMany({
