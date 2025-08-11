@@ -4,10 +4,10 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
-import { authRoutes } from "../src/routes/auth.routes.js";
-import { errorHandler } from "../src/middlewares/error_handler.js";
-import { swaggerUi, swaggerSpec } from "../src/swagger.js";
-import { tripRoutes } from "../src/routes/trip.routes.js";
+import { authRoutes } from "./routes/auth.routes.js";
+import { errorHandler } from "./middlewares/error_handler.js";
+import { swaggerUi, swaggerSpec } from "./swagger.js";
+import { tripRoutes } from "./routes/trip.routes.js";
 
 dotenv.config();
 
