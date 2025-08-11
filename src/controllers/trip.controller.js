@@ -33,9 +33,10 @@ const create = asyncWrapper(async (req, res) => {
 });
 
 const list = asyncWrapper(async (req, res) => {
-  const trips = await getTrips(req.user.user_id);
-  response.success(res, trips.data, "Trips fetched successfully");
+  const trips = await getTrips(req.user.user_id, req.query);
+  response.success(res, trips, "Trips fetched successfully");
 });
+
 
 
 

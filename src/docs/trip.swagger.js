@@ -30,10 +30,47 @@
  *   get:
  *     summary: Get all trips for the authenticated user
  *     tags: [Trips]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *           minimum: 1
+ *         description: Page number (minimum 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of items per page (1-100)
+ *       - in: query
+ *         name: sort_by
+ *         schema:
+ *           type: string
+ *           enum: [createdAt, startDate, endDate, location, budget, totalCost]
+ *           default: createdAt
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sort_order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search keyword (filters by location)
  *     responses:
  *       200:
  *         description: Trips fetched successfully
  */
+
+
 
 /**
  * @swagger

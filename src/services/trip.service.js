@@ -2,6 +2,7 @@ import { prisma } from "../prisma.js";
 import { CustomError } from "../utils/custom_error.js";
 import { uploadImage, deleteImage } from "../services/cloudinary.service.js";
 import { optimizeImage } from "../utils/imageOptimizer.js";
+import { buildQueryOptions } from "../utils/queryHelper.js";
 
 export const createTrip = async (userId, createdBy, data, fileBuffer) => {
   let imageUrl = null;
@@ -35,15 +36,95 @@ export const createTrip = async (userId, createdBy, data, fileBuffer) => {
   return { data: trip };
 };
 
-export const getTrips = async (userId) => {
-  const trips = await prisma.trip.findMany({
-    where: { userId },
-    include: { days: true },
-    orderBy: { createdAt: "desc" },
-  });
-  return { data: trips };
+// export const getTrips = async (userId, query) => {
+//   const options = buildQueryOptions(query, ["title", "description"]);
+
+//   const trips = await prisma.trip.findMany({
+//     where: { userId, ...options.where },
+//     skip: options.skip,
+//     take: options.take,
+//     orderBy: options.orderBy,
+//     include: { days: true },
+//   });
+
+//   const total = await prisma.trip.count({
+//     where: { userId, ...options.where },
+//   });
+
+//   return {
+//     data: trips,
+//     pagination: {
+//       totalItems: total,
+//       currentPage: Number(query.page) || 1,
+//       limit: Number(query.limit) || 10,
+//       totalPages: Math.ceil(total / (Number(query.limit) || 10)),
+//       itemsPerPage: Number(query.limit) || 10,
+//     },
+//   };
+// };
+
+const VALID_SORT_FIELDS = [
+  "createdAt",
+  "startDate",
+  "endDate",
+  "location",
+  "budget",
+  "totalCost",
+];
+
+const sanitizeSortBy = (sort_by) =>
+  VALID_SORT_FIELDS.includes(sort_by) ? sort_by : "createdAt";
+
+const sanitizeSortOrder = (sort_order) =>
+  sort_order === "asc" || sort_order === "desc" ? sort_order : "desc";
+
+const sanitizePage = (page) => {
+  const p = Number(page);
+  return isNaN(p) || p < 1 ? 1 : p;
 };
 
+const sanitizeLimit = (limit) => {
+  const l = Number(limit);
+  if (isNaN(l) || l < 1) return 10;
+  if (l > 100) return 100;
+  return l;
+};
+
+export const getTrips = async (userId, query) => {
+  const page = sanitizePage(query.page);
+  const limit = sanitizeLimit(query.limit);
+  const sort_by = sanitizeSortBy(query.sort_by);
+  const sort_order = sanitizeSortOrder(query.sort_order);
+  const search = (query.search || "").trim();
+
+  const options = buildQueryOptions(
+    { page, limit, sort_by, sort_order, search },
+    ["location"]
+  );
+
+  const trips = await prisma.trip.findMany({
+    where: { userId, ...options.where },
+    skip: options.skip,
+    take: options.take,
+    orderBy: options.orderBy,
+    include: { days: true },
+  });
+
+  const total = await prisma.trip.count({
+    where: { userId, ...options.where },
+  });
+
+  return {
+    data: trips,
+    pagination: {
+      totalItems: total,
+      currentPage: page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      itemsPerPage: limit,
+    },
+  };
+};
 
 
 
