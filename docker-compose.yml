@@ -6,10 +6,10 @@ services:
       args:
         DATABASE_URL: "postgres://avnadmin:AVNS_VOmHk7N78V_u0eCW0nS@pg-2ee0a71d-ahmedshafi7812-88d3.k.aivencloud.com:11619/gavindorsey-social-travel-app?sslmode=require"
     ports:
-      - "3014:3000"
+      - "3015:5000"
     environment:
       - NODE_ENV=production
-      - PORT=3000
+      - PORT=5000
       - CLOUDINARY_CLOUD_NAME=drlvkewb
       - CLOUDINARY_API_KEY=525653973231317
       - CLOUDINARY_API_SECRET=243Kef3a4ZlLDKpAnls6a-zJbfE
