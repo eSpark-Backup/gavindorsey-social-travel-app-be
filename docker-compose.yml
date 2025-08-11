@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   app:
     build:
@@ -17,4 +16,5 @@ services:
       - DATABASE_URL=postgres://avnadmin:AVNS_VOmHk7N78V_u0eCW0nS@pg-2ee0a71d-ahmedshafi7812-88d3.k.aivencloud.com:11619/gavindorsey-social-travel-app?sslmode=require
     volumes:
       - .:/app
+      - /app/node_modules
     restart: unless-stopped
