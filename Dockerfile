@@ -1,20 +1,16 @@
-# Use official Node.js LTS image
-FROM node:18-alpine
+FROM node:20-bullseye
 
-# Set working directory
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm install --production
-
-# Copy the rest of the application code
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 3014
+RUN npx prisma generate
 
-# Start the application
-CMD ["node", "src/index.js"]
+EXPOSE 3014
+CMD ["npm", "run", "start"]
