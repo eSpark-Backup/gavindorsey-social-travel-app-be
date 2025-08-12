@@ -47,7 +47,7 @@
  * @swagger
  * /api/auth/social-login:
  *   post:
- *     summary: Log in or sign up using Google OAuth
+ *     summary: Log in or sign up using social login
  *     tags: [Auth]
  *     requestBody:
  *       required: true

@@ -20,8 +20,9 @@ const loginSchema = Joi.object({
 });
 
 const socialLoginSchema = Joi.object({
-  provider: Joi.string().valid("google", "apple").required(),
-  id_token: Joi.string().required(),
+  firstName: Joi.string().trim().min(2).max(50).required(),
+  lastName: Joi.string().trim().min(0).max(50).allow(""),
+  email: Joi.string().trim().lowercase().email().required(),
 });
 
 export { signUpSchema, loginSchema, socialLoginSchema };

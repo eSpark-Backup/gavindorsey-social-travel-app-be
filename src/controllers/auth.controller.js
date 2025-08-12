@@ -78,29 +78,20 @@ const login = asyncWrapper(async (req, res) => {
 });
 
 const socialLogin = asyncWrapper(async (req, res) => {
-  const { provider, id_token } = req.body;
+  const { firstName, lastName, email } = req.body;
 
-  let userInfo;
-  if (provider === "google") {
-    userInfo = await verifyGoogleToken(id_token);
-  } else if (provider === "apple") {
-    userInfo = await verifyAppleToken(id_token);
+  if (!email) {
+    throw new CustomError("Email is required", 400);
   }
 
-  if (!userInfo?.email) {
-    throw new CustomError("Unable to retrieve email from provider", 400);
-  }
-
-  let user = await prisma.user.findUnique({
-    where: { email: userInfo.email },
-  });
+  let user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
     user = await prisma.user.create({
       data: {
-        firstName: userInfo.firstName || "User",
-        lastName: userInfo.lastName || "",
-        email: userInfo.email,
+        firstName: firstName || "User",
+        lastName: lastName || "",
+        email,
         password: "",
         isSocialLogin: true,
       },
@@ -128,5 +119,6 @@ const socialLogin = asyncWrapper(async (req, res) => {
     "Social login successful"
   );
 });
+
 
 export { signUp, login, socialLogin };

@@ -31,12 +31,13 @@
  *     SocialLogin:
  *       type: object
  *       required:
- *         - provider
- *         - id_token
+ *         - first_name
+ *         - email
  *       properties:
- *         provider:
+ *         first_name:
  *           type: string
- *           enum: [google, apple]
- *         id_token:
+ *         last_name:
+ *           type: string
+ *         email:
  *           type: string
  */
