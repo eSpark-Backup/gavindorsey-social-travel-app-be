@@ -4,7 +4,6 @@ import { generateToken } from "../utils/token.js";
 import { asyncWrapper } from "../utils/async_wrapper.js";
 import { CustomError } from "../utils/custom_error.js";
 import { comparePassword } from "../utils/hash.js";
-import { verifyGoogleToken, verifyAppleToken } from "../utils/social_auth.js";
 import * as response from "../utils/response.js";
 
 const signUp = asyncWrapper(async (req, res) => {
