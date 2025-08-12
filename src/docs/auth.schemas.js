@@ -5,14 +5,14 @@
  *     SignUp:
  *       type: object
  *       required:
- *         - first_name
- *         - last_name
+ *         - firstName
+ *         - lastName
  *         - email
  *         - password
  *       properties:
- *         first_name:
+ *         firstName:
  *           type: string
- *         last_name:
+ *         lastName:
  *           type: string
  *         email:
  *           type: string
@@ -31,12 +31,12 @@
  *     SocialLogin:
  *       type: object
  *       required:
- *         - first_name
+ *         - firstName
  *         - email
  *       properties:
- *         first_name:
+ *         firstName:
  *           type: string
- *         last_name:
+ *         lastName:
  *           type: string
  *         email:
  *           type: string
