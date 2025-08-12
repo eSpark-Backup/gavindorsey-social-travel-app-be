@@ -9,7 +9,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5000
-      - CLOUDINARY_CLOUD_NAME=drlvkewb
+      - CLOUDINARY_CLOUD_NAME=drlvkewbn
       - CLOUDINARY_API_KEY=525653973231317
       - CLOUDINARY_API_SECRET=243Kef3a4ZlLDKpAnls6a-zJbfE
       - GOOGLE_CLIENT_ID=703404903953-60f8cjvn5gflq5bic7q4ad01fnvt5it0.apps.googleusercontent.com
