@@ -9,11 +9,6 @@ const swaggerSpec = swaggerJsDoc({
       version: "1.0.0",
       description: "API documentation for the Social Travel App",
     },
-    servers: [
-      {
-        url: "http://localhost:5000",
-      },
-    ],
     components: {
       securitySchemes: {
         bearerAuth: {
