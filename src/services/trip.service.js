@@ -115,7 +115,7 @@ export const getTrips = async (userId, query) => {
   });
 
   return {
-    data: trips,
+    trips,
     pagination: {
       totalItems: total,
       currentPage: page,

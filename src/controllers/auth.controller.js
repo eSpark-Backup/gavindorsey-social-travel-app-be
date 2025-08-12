@@ -4,6 +4,7 @@ import { generateToken } from "../utils/token.js";
 import { asyncWrapper } from "../utils/async_wrapper.js";
 import { CustomError } from "../utils/custom_error.js";
 import { comparePassword } from "../utils/hash.js";
+import { verifyGoogleToken, verifyAppleToken } from "../utils/social_auth.js";
 import * as response from "../utils/response.js";
 
 const signUp = asyncWrapper(async (req, res) => {
@@ -76,4 +77,56 @@ const login = asyncWrapper(async (req, res) => {
   );
 });
 
-export { signUp, login };
+const socialLogin = asyncWrapper(async (req, res) => {
+  const { provider, id_token } = req.body;
+
+  let userInfo;
+  if (provider === "google") {
+    userInfo = await verifyGoogleToken(id_token);
+  } else if (provider === "apple") {
+    userInfo = await verifyAppleToken(id_token);
+  }
+
+  if (!userInfo?.email) {
+    throw new CustomError("Unable to retrieve email from provider", 400);
+  }
+
+  let user = await prisma.user.findUnique({
+    where: { email: userInfo.email },
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        firstName: userInfo.firstName || "User",
+        lastName: userInfo.lastName || "",
+        email: userInfo.email,
+        password: "",
+        isSocialLogin: true,
+      },
+    });
+  }
+
+  await prisma.user.update({
+    where: { email: user.email },
+    data: { lastLoginAt: new Date() },
+  });
+
+  const token = generateToken({ user_id: user.id, email: user.email });
+
+  response.success(
+    res,
+    {
+      user_id: user.id,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      email: user.email,
+      lastLoginAt: user.lastLoginAt,
+      isSocialLogin: user.isSocialLogin,
+      token,
+    },
+    "Social login successful"
+  );
+});
+
+export { signUp, login, socialLogin };

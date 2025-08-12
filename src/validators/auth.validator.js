@@ -19,4 +19,9 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-export { signUpSchema, loginSchema };
+const socialLoginSchema = Joi.object({
+  provider: Joi.string().valid("google", "apple").required(),
+  id_token: Joi.string().required(),
+});
+
+export { signUpSchema, loginSchema, socialLoginSchema };

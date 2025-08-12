@@ -28,4 +28,15 @@
  *           type: string
  *         password:
  *           type: string
+ *     SocialLogin:
+ *       type: object
+ *       required:
+ *         - provider
+ *         - id_token
+ *       properties:
+ *         provider:
+ *           type: string
+ *           enum: [google, apple]
+ *         id_token:
+ *           type: string
  */

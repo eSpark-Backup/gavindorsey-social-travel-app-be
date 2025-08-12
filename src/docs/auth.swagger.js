@@ -45,32 +45,19 @@
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     SignUp:
- *       type: object
- *       required:
- *         - first_name
- *         - last_name
- *         - email
- *         - password
- *       properties:
- *         first_name:
- *           type: string
- *         last_name:
- *           type: string
- *         email:
- *           type: string
- *         password:
- *           type: string
- *     Login:
- *       type: object
- *       required:
- *         - email
- *         - password
- *       properties:
- *         email:
- *           type: string
- *         password:
- *           type: string
+ * /api/auth/social-login:
+ *   post:
+ *     summary: Log in or sign up using Google OAuth
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SocialLogin'
+ *     responses:
+ *       200:
+ *         description: Social login successful
+ *       400:
+ *         description: Validation error
  */
