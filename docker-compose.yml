@@ -12,6 +12,8 @@ services:
       - CLOUDINARY_CLOUD_NAME=drlvkewb
       - CLOUDINARY_API_KEY=525653973231317
       - CLOUDINARY_API_SECRET=243Kef3a4ZlLDKpAnls6a-zJbfE
+      - GOOGLE_CLIENT_ID=703404903953-60f8cjvn5gflq5bic7q4ad01fnvt5it0.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
       - JWT_SECRET=this_is_your_super_secret_jwt_key
       - DATABASE_URL=postgres://avnadmin:AVNS_VOmHk7N78V_u0eCW0nS@pg-2ee0a71d-ahmedshafi7812-88d3.k.aivencloud.com:11619/gavindorsey-social-travel-app?sslmode=require
     volumes:
