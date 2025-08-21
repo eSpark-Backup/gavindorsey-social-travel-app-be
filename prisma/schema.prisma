@@ -29,7 +29,6 @@ model Trip {
   publicId  String?
   startDate DateTime
   endDate   DateTime
-  location  String
   budget    Decimal  @db.Decimal(10, 2)
   totalCost Decimal  @default(0.00) @db.Decimal(10, 2)
   createdAt DateTime @default(now())

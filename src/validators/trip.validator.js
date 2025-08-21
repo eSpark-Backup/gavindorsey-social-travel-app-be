@@ -7,9 +7,11 @@ const daySchema = Joi.object({
 });
 
 const markerSchema = Joi.object({
-  name: Joi.string().trim().min(1).max(100).required(),
+  name: Joi.string().trim().optional(),
   lat: Joi.number().min(-90).max(90).required(),
   lon: Joi.number().min(-180).max(180).required(),
+  address: Joi.string().trim().optional(),
+  description: Joi.string().trim().optional(),
 });
 
 export const createTripValidator = Joi.object({
@@ -17,7 +19,6 @@ export const createTripValidator = Joi.object({
   imageUrl: Joi.string().uri().optional(),
   startDate: Joi.date().iso().required(),
   endDate: Joi.date().iso().min(Joi.ref("startDate")).required(),
-  location: Joi.string().trim().min(2).max(100).required(),
   budget: Joi.number().precision(2).positive().required(),
   totalCost: Joi.number().precision(2).min(0).optional(),
   days: Joi.array().items(daySchema).optional(),
@@ -33,7 +34,6 @@ export const updateTripValidator = Joi.object({
     then: Joi.required(),
     otherwise: Joi.optional(),
   }),
-  location: Joi.string().trim().min(2).max(100).optional(),
   budget: Joi.number().precision(2).positive().optional(),
   totalCost: Joi.number().precision(2).min(0).optional(),
   days: Joi.array().items(daySchema).optional(),

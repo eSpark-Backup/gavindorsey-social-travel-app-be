@@ -50,7 +50,7 @@
  *         name: sort_by
  *         schema:
  *           type: string
- *           enum: [createdAt, startDate, endDate, location, budget, totalCost]
+ *           enum: [createdAt, startDate, endDate, budget, totalCost]
  *           default: createdAt
  *         description: Field to sort by
  *       - in: query
@@ -64,7 +64,7 @@
  *         name: search
  *         schema:
  *           type: string
- *         description: Search by location keyword
+ *         description: Search by location
  *     responses:
  *       200:
  *         description: Trips fetched successfully
@@ -147,8 +147,6 @@
  *       properties:
  *         title:
  *           type: string
- *         location:
- *           type: string
  *         startDate:
  *           type: string
  *           format: date
@@ -165,8 +163,6 @@
  *       type: object
  *       properties:
  *         title:
- *           type: string
- *         location:
  *           type: string
  *         startDate:
  *           type: string

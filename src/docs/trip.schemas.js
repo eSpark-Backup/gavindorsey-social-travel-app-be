@@ -37,7 +37,6 @@
  *         - title
  *         - startDate
  *         - endDate
- *         - location
  *         - budget
  *         - image
  *       properties:
@@ -52,9 +51,6 @@
  *           type: string
  *           format: date
  *           example: "2025-08-10"
- *         location:
- *           type: string
- *           example: "Paris, France"
  *         budget:
  *           type: number
  *           format: float
@@ -82,6 +78,8 @@
  *             - name: "Eiffel Tower"
  *               lat: 48.8584
  *               lon: 2.2945
+ *               address: "Address of a location"
+ *               description: "Description about the location"
  *
  *     UpdateTrip:
  *       type: object
@@ -97,9 +95,6 @@
  *           type: string
  *           format: date
  *           example: "2025-08-12"
- *         location:
- *           type: string
- *           example: "Rome, Italy"
  *         budget:
  *           type: number
  *           format: float
@@ -127,4 +122,6 @@
  *             - name: "Colosseum"
  *               lat: 41.8902
  *               lon: 12.4922
+ *               address: "Address of a location"
+ *               description: "Description of a location"
  */

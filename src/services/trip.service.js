@@ -11,7 +11,6 @@ const VALID_SORT_FIELDS = [
   "createdAt",
   "startDate",
   "endDate",
-  "location",
   "budget",
   "totalCost",
 ];
@@ -64,9 +63,11 @@ export const createTrip = async (userId, createdBy, data, file_buffer) => {
   const enrichedMarkers = markers?.length
     ? await Promise.all(
         markers.map(async (m) => ({
-          name: m.name,
+          name: m.name || null,
           lat: m.lat,
           lon: m.lon,
+          address: m.address || null,
+          description: m.description || null,
           ...(await enrichLocationData(m.lat, m.lon)),
         }))
       )
@@ -193,10 +194,11 @@ export const updateTrip = async (userId, tripId, data, file_buffer) => {
     await prisma.marker.deleteMany({ where: { tripId: tripId } });
     const enrichedMarkers = await Promise.all(
       markers.map(async (m) => ({
-        name: m.name,
+        name: m.name || null,
         lat: m.lat,
         lon: m.lon,
         address: m.address || null,
+        description: m.description || null,
         ...(await enrichLocationData(m.lat, m.lon)),
       }))
     );
