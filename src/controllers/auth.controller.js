@@ -7,7 +7,7 @@ import { comparePassword } from "../utils/hash.js";
 import * as response from "../utils/response.js";
 
 const signUp = asyncWrapper(async (req, res) => {
-  const { first_name, last_name, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
@@ -18,21 +18,21 @@ const signUp = asyncWrapper(async (req, res) => {
 
   const user = await prisma.user.create({
     data: {
-      firstName: first_name,
-      lastName: last_name,
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
     },
   });
 
-  const token = generateToken({ user_id: user.id, email: user.email });
+  const token = generateToken({ userId: user.id, email: user.email });
 
   response.success(
     res,
     {
-      user_id: user.id,
-      first_name: user.firstName,
-      last_name: user.lastName,
+      userId: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       token,
     },
@@ -59,14 +59,14 @@ const login = asyncWrapper(async (req, res) => {
     data: { lastLoginAt: new Date() },
   });
 
-  const token = generateToken({ user_id: user.id, email: user.email });
+  const token = generateToken({ userId: user.id, email: user.email });
 
   response.success(
     res,
     {
-      user_id: user.id,
-      first_name: user.firstName,
-      last_name: user.lastName,
+      userId: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       lastLoginAt: user.lastLoginAt,
       isSocialLogin: user.isSocialLogin,
@@ -102,14 +102,14 @@ const socialLogin = asyncWrapper(async (req, res) => {
     data: { lastLoginAt: new Date() },
   });
 
-  const token = generateToken({ user_id: user.id, email: user.email });
+  const token = generateToken({ userId: user.id, email: user.email });
 
   response.success(
     res,
     {
-      user_id: user.id,
-      first_name: user.firstName,
-      last_name: user.lastName,
+      userId: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       lastLoginAt: user.lastLoginAt,
       isSocialLogin: user.isSocialLogin,
@@ -118,6 +118,5 @@ const socialLogin = asyncWrapper(async (req, res) => {
     "Social login successful"
   );
 });
-
 
 export { signUp, login, socialLogin };

@@ -33,8 +33,8 @@ const create = asyncWrapper(async (req, res) => {
   }));
 
   const { data } = await createTrip(
-    req.user.user_id,
-    req.user.user_id,
+    req.user.userId,
+    req.user.userId,
     {
       startDate: startDate ? new Date(startDate) : null,
       endDate: endDate ? new Date(endDate) : null,
@@ -52,7 +52,7 @@ const create = asyncWrapper(async (req, res) => {
 
 // List trips
 const list = asyncWrapper(async (req, res) => {
-  const { data, pagination } = await getTrips(req.user.user_id, req.query);
+  const { data, pagination } = await getTrips(req.user.userId, req.query);
   response.success(
     res,
     { trips: data, pagination },
@@ -62,14 +62,14 @@ const list = asyncWrapper(async (req, res) => {
 
 // Get trip by ID
 const getById = asyncWrapper(async (req, res) => {
-  const { trip_id } = req.params;
-  const { data } = await getTripById(req.user.user_id, trip_id);
+  const { tripId } = req.params;
+  const { data } = await getTripById(req.user.userId, tripId);
   response.success(res, data, "Trip fetched successfully");
 });
 
 // Update trip
 const update = asyncWrapper(async (req, res) => {
-  const { trip_id } = req.params;
+  const { tripId } = req.params;
   const {
     startDate,
     endDate,
@@ -96,8 +96,8 @@ const update = asyncWrapper(async (req, res) => {
   }));
 
   const { data } = await updateTrip(
-    req.user.user_id,
-    trip_id,
+    req.user.userId,
+    tripId,
     {
       imageUrl: imageUrl || null,
       startDate: startDate ? new Date(startDate) : undefined,
@@ -116,8 +116,8 @@ const update = asyncWrapper(async (req, res) => {
 
 // Delete trip
 const remove = asyncWrapper(async (req, res) => {
-  const { trip_id } = req.params;
-  const { data } = await deleteTrip(req.user.user_id, trip_id);
+  const { tripId } = req.params;
+  const { data } = await deleteTrip(req.user.userId, tripId);
   response.success(res, data, "Trip deleted successfully");
 });
 
@@ -133,7 +133,7 @@ const getMarkerDetails = asyncWrapper(async (req, res) => {
     );
   }
 
-  const [safety_info, weather_info, air_quality_info] = await Promise.all([
+  const [safetyInfo, weatherInfo, airQualityInfo] = await Promise.all([
     getSafetyInfo(lat, lon),
     getWeatherInfo(lat, lon),
     getAirQualityInfo(lat, lon),
@@ -141,7 +141,7 @@ const getMarkerDetails = asyncWrapper(async (req, res) => {
 
   response.success(
     res,
-    { safety_info, weather_info, air_quality_info },
+    { safetyInfo, weatherInfo, airQualityInfo },
     "Marker details fetched successfully"
   );
 });
