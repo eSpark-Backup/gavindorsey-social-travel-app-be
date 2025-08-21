@@ -5,7 +5,7 @@
  *     TripDay:
  *       type: object
  *       properties:
- *         day_number:
+ *         dayNumber:
  *           type: integer
  *           example: 1
  *         notes:
@@ -34,20 +34,20 @@
  *     CreateTrip:
  *       type: object
  *       required:
- *         - start_date
- *         - end_date
+ *         - startDate
+ *         - endDate
  *         - location
  *         - budget
  *       properties:
- *         image_url:
+ *         imageUrl:
  *           type: string
  *           format: uri
  *           example: "https://res.cloudinary.com/demo/image/upload/sample.jpg"
- *         start_date:
+ *         startDate:
  *           type: string
  *           format: date
  *           example: "2025-08-01"
- *         end_date:
+ *         endDate:
  *           type: string
  *           format: date
  *           example: "2025-08-10"
@@ -58,7 +58,7 @@
  *           type: number
  *           format: float
  *           example: 2500
- *         total_cost:
+ *         totalCost:
  *           type: number
  *           format: float
  *           example: 2000
@@ -67,10 +67,10 @@
  *           items:
  *             $ref: '#/components/schemas/TripDay'
  *           example:
- *             - day_number: 1
+ *             - dayNumber: 1
  *               notes: "Visited the Eiffel Tower"
  *               cost: 150
- *             - day_number: 2
+ *             - dayNumber: 2
  *               notes: "Louvre Museum tour"
  *               cost: 100
  *         markers:
@@ -85,15 +85,15 @@
  *     UpdateTrip:
  *       type: object
  *       properties:
- *         image_url:
+ *         imageUrl:
  *           type: string
  *           format: uri
  *           example: "https://res.cloudinary.com/demo/image/upload/updated.jpg"
- *         start_date:
+ *         startDate:
  *           type: string
  *           format: date
  *           example: "2025-08-02"
- *         end_date:
+ *         endDate:
  *           type: string
  *           format: date
  *           example: "2025-08-12"
@@ -104,7 +104,7 @@
  *           type: number
  *           format: float
  *           example: 3000
- *         total_cost:
+ *         totalCost:
  *           type: number
  *           format: float
  *           example: 2800
@@ -113,10 +113,10 @@
  *           items:
  *             $ref: '#/components/schemas/TripDay'
  *           example:
- *             - day_number: 1
+ *             - dayNumber: 1
  *               notes: "Colosseum tour"
  *               cost: 120
- *             - day_number: 2
+ *             - dayNumber: 2
  *               notes: "Vatican City visit"
  *               cost: 200
  *         markers:

@@ -1,5 +1,3 @@
-import { CustomError } from "../utils/custom_error.js";
-
 const errorHandler = (err, req, res, next) => {
   console.log(err);
   const status = err.statusCode || 500;

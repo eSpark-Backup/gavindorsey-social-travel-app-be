@@ -1,4 +1,3 @@
-// services/trip.service.js
 import { prisma } from "../prisma.js";
 import { CustomError } from "../utils/custom_error.js";
 import { uploadImage, deleteImage } from "./cloudinary.service.js";
@@ -49,7 +48,7 @@ const enrichLocationData = async (lat, lon) => {
   };
 };
 
-export const createTrip = async (user_id, created_by, data, file_buffer) => {
+export const createTrip = async (userId, createdBy, data, file_buffer) => {
   let imageUrl = null;
   let publicId = null;
 
@@ -75,15 +74,15 @@ export const createTrip = async (user_id, created_by, data, file_buffer) => {
 
   const trip = await prisma.trip.create({
     data: {
-      user: { connect: { id: user_id } }, // ✅ Fix: connect existing user
-      createdBy: created_by,
+      user: { connect: { id: userId } },
+      createdBy: createdBy,
       ...trip_data,
       imageUrl,
       publicId,
       days: days?.length
         ? {
             create: days.map((d) => ({
-              dayNumber: d.dayNumber ?? null, // prevent undefined
+              dayNumber: d.dayNumber ?? null,
               notes: d.notes,
               cost: d.cost,
             })),
@@ -97,8 +96,7 @@ export const createTrip = async (user_id, created_by, data, file_buffer) => {
   return { data: trip };
 };
 
-
-export const getTrips = async (user_id, query) => {
+export const getTrips = async (userId, query) => {
   const page = sanitizePage(query.page);
   const limit = sanitizeLimit(query.limit);
   const sort_by = sanitizeSortBy(query.sort_by);
@@ -111,7 +109,7 @@ export const getTrips = async (user_id, query) => {
   );
 
   const trips = await prisma.trip.findMany({
-    where: { userId: user_id, ...options.where },
+    where: { userId: userId, ...options.where },
     skip: options.skip,
     take: options.take,
     orderBy: options.orderBy,
@@ -119,23 +117,23 @@ export const getTrips = async (user_id, query) => {
   });
 
   const total = await prisma.trip.count({
-    where: { userId: user_id, ...options.where },
+    where: { userId: userId, ...options.where },
   });
 
   return {
     data: trips,
     pagination: {
-      total_items: total,
-      current_page: page,
-      total_pages: Math.ceil(total / limit),
-      items_per_page: limit,
+      totalItems: total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      itemsPerPage: limit,
     },
   };
 };
 
-export const getTripById = async (user_id, trip_id) => {
+export const getTripById = async (userId, tripId) => {
   const trip = await prisma.trip.findFirst({
-    where: { id: trip_id, userId: user_id },
+    where: { id: tripId, userId: userId },
     include: { days: true, markers: true },
   });
 
@@ -143,19 +141,19 @@ export const getTripById = async (user_id, trip_id) => {
   return { data: trip };
 };
 
-export const updateTrip = async (user_id, trip_id, data, file_buffer) => {
-  let imageUrl = data.imageUrl ?? data.image_url ?? null;
-  let publicId = data.publicId ?? data.public_id ?? null;
+export const updateTrip = async (userId, tripId, data, file_buffer) => {
+  let imageUrl = data.imageUrl ?? data.imageUrl ?? null;
+  let publicId = data.publicId ?? data.publicId ?? null;
 
   if (file_buffer) {
     const optimizedBuffer = await optimizeImage(file_buffer);
-    const current_trip = await prisma.trip.findUnique({
-      where: { id: trip_id },
+    const currentTrip = await prisma.trip.findUnique({
+      where: { id: tripId },
     });
 
-    if (current_trip?.publicId) {
+    if (currentTrip?.publicId) {
       try {
-        await deleteImage(current_trip.publicId);
+        await deleteImage(currentTrip.publicId);
       } catch (err) {
         console.error("Error deleting old image:", err);
       }
@@ -163,13 +161,13 @@ export const updateTrip = async (user_id, trip_id, data, file_buffer) => {
 
     const uploaded = await uploadImage(optimizedBuffer, "trips");
     imageUrl = uploaded.url;
-    publicId = uploaded.public_id;
+    publicId = uploaded.publicId;
   }
 
   const { days, markers, ...trip_data } = data;
 
   const updated_count = await prisma.trip.updateMany({
-    where: { id: trip_id, userId: user_id },
+    where: { id: tripId, userId: userId },
     data: {
       ...trip_data,
       imageUrl,
@@ -180,10 +178,10 @@ export const updateTrip = async (user_id, trip_id, data, file_buffer) => {
   if (!updated_count.count) throw new CustomError("Trip not found", 404);
 
   if (days) {
-    await prisma.day.deleteMany({ where: { tripId: trip_id } });
+    await prisma.day.deleteMany({ where: { tripId: tripId } });
     await prisma.day.createMany({
       data: days.map((d) => ({
-        tripId: trip_id,
+        tripId: tripId,
         dayNumber: d.dayNumber ?? d.day_number,
         notes: d.notes,
         cost: d.cost,
@@ -192,7 +190,7 @@ export const updateTrip = async (user_id, trip_id, data, file_buffer) => {
   }
 
   if (markers) {
-    await prisma.marker.deleteMany({ where: { tripId: trip_id } });
+    await prisma.marker.deleteMany({ where: { tripId: tripId } });
     const enrichedMarkers = await Promise.all(
       markers.map(async (m) => ({
         name: m.name,
@@ -203,21 +201,21 @@ export const updateTrip = async (user_id, trip_id, data, file_buffer) => {
       }))
     );
     await prisma.marker.createMany({
-      data: enrichedMarkers.map((m) => ({ ...m, tripId: trip_id })),
+      data: enrichedMarkers.map((m) => ({ ...m, tripId: tripId })),
     });
   }
 
   const updated_trip = await prisma.trip.findUnique({
-    where: { id: trip_id },
+    where: { id: tripId },
     include: { days: true, markers: true },
   });
 
   return { data: updated_trip };
 };
 
-export const deleteTrip = async (user_id, trip_id) => {
+export const deleteTrip = async (userId, tripId) => {
   const trip = await prisma.trip.findFirst({
-    where: { id: trip_id, userId: user_id },
+    where: { id: tripId, userId: userId },
   });
 
   if (!trip) throw new CustomError("Trip not found", 404);
@@ -227,7 +225,7 @@ export const deleteTrip = async (user_id, trip_id) => {
   }
 
   const deleted = await prisma.trip.deleteMany({
-    where: { id: trip_id, userId: user_id },
+    where: { id: tripId, userId: userId },
   });
 
   if (!deleted.count) throw new CustomError("Trip not found", 404);

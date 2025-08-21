@@ -50,8 +50,8 @@
  *         name: sort_by
  *         schema:
  *           type: string
- *           enum: [created_at, start_date, end_date, location, budget, total_cost]
- *           default: created_at
+ *           enum: [createdAt, startDate, endDate, location, budget, totalCost]
+ *           default: createdAt
  *         description: Field to sort by
  *       - in: query
  *         name: sort_order
@@ -72,13 +72,13 @@
 
 /**
  * @swagger
- * /api/trips/{trip_id}:
+ * /api/trips/{tripId}:
  *   get:
  *     summary: Get trip details by ID
  *     tags: [Trips]
  *     parameters:
  *       - in: path
- *         name: trip_id
+ *         name: tripId
  *         required: true
  *         schema:
  *           type: string
@@ -92,13 +92,13 @@
 
 /**
  * @swagger
- * /api/trips/{trip_id}:
+ * /api/trips/{tripId}:
  *   put:
  *     summary: Update an existing trip
  *     tags: [Trips]
  *     parameters:
  *       - in: path
- *         name: trip_id
+ *         name: tripId
  *         required: true
  *         schema:
  *           type: string
@@ -120,13 +120,13 @@
 
 /**
  * @swagger
- * /api/trips/{trip_id}:
+ * /api/trips/{tripId}:
  *   delete:
  *     summary: Delete a trip
  *     tags: [Trips]
  *     parameters:
  *       - in: path
- *         name: trip_id
+ *         name: tripId
  *         required: true
  *         schema:
  *           type: string
