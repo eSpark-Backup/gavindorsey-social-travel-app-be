@@ -1,67 +1,12 @@
+// services/trip.service.js
 import { prisma } from "../prisma.js";
 import { CustomError } from "../utils/custom_error.js";
-import { uploadImage, deleteImage } from "../services/cloudinary.service.js";
+import { uploadImage, deleteImage } from "./cloudinary.service.js";
 import { optimizeImage } from "../utils/imageOptimizer.js";
 import { buildQueryOptions } from "../utils/queryHelper.js";
-
-export const createTrip = async (userId, createdBy, data, fileBuffer) => {
-  let imageUrl = null;
-  let publicId = null;
-
-  if (fileBuffer) {
-    const optimizedBuffer = await optimizeImage(fileBuffer);
-    const uploaded = await uploadImage(optimizedBuffer, "trips");
-    imageUrl = uploaded.url;
-    publicId = uploaded.public_id;
-  }
-
-  const { days, ...tripData } = data;
-
-  const trip = await prisma.trip.create({
-    data: {
-      userId,
-      createdBy,
-      ...tripData,
-      imageUrl,
-      publicId,
-      days: days
-        ? {
-            create: days,
-          }
-        : undefined,
-    },
-    include: { days: true },
-  });
-
-  return { data: trip };
-};
-
-// export const getTrips = async (userId, query) => {
-//   const options = buildQueryOptions(query, ["title", "description"]);
-
-//   const trips = await prisma.trip.findMany({
-//     where: { userId, ...options.where },
-//     skip: options.skip,
-//     take: options.take,
-//     orderBy: options.orderBy,
-//     include: { days: true },
-//   });
-
-//   const total = await prisma.trip.count({
-//     where: { userId, ...options.where },
-//   });
-
-//   return {
-//     data: trips,
-//     pagination: {
-//       totalItems: total,
-//       currentPage: Number(query.page) || 1,
-//       limit: Number(query.limit) || 10,
-//       totalPages: Math.ceil(total / (Number(query.limit) || 10)),
-//       itemsPerPage: Number(query.limit) || 10,
-//     },
-//   };
-// };
+import { getSafetyInfo } from "./safety.service.js";
+import { getWeatherInfo } from "./weather.service.js";
+import { getAirQualityInfo } from "./airquality.service.js";
 
 const VALID_SORT_FIELDS = [
   "createdAt",
@@ -90,7 +35,70 @@ const sanitizeLimit = (limit) => {
   return l;
 };
 
-export const getTrips = async (userId, query) => {
+const enrichLocationData = async (lat, lon) => {
+  const [safety, weather, airQuality] = await Promise.all([
+    getSafetyInfo(lat, lon),
+    getWeatherInfo(lat, lon),
+    getAirQualityInfo(lat, lon),
+  ]);
+
+  return {
+    safetyJson: safety || {},
+    weatherJson: weather || {},
+    airJson: airQuality || {},
+  };
+};
+
+export const createTrip = async (user_id, created_by, data, file_buffer) => {
+  let imageUrl = null;
+  let publicId = null;
+
+  if (file_buffer) {
+    const optimizedBuffer = await optimizeImage(file_buffer);
+    const uploaded = await uploadImage(optimizedBuffer, "trips");
+    imageUrl = uploaded.url;
+    publicId = uploaded.public_id;
+  }
+
+  const { days, markers, ...trip_data } = data;
+
+  const enrichedMarkers = markers?.length
+    ? await Promise.all(
+        markers.map(async (m) => ({
+          name: m.name,
+          lat: m.lat,
+          lon: m.lon,
+          ...(await enrichLocationData(m.lat, m.lon)),
+        }))
+      )
+    : [];
+
+  const trip = await prisma.trip.create({
+    data: {
+      user: { connect: { id: user_id } }, // ✅ Fix: connect existing user
+      createdBy: created_by,
+      ...trip_data,
+      imageUrl,
+      publicId,
+      days: days?.length
+        ? {
+            create: days.map((d) => ({
+              dayNumber: d.dayNumber ?? null, // prevent undefined
+              notes: d.notes,
+              cost: d.cost,
+            })),
+          }
+        : undefined,
+      markers: enrichedMarkers.length ? { create: enrichedMarkers } : undefined,
+    },
+    include: { days: true, markers: true },
+  });
+
+  return { data: trip };
+};
+
+
+export const getTrips = async (user_id, query) => {
   const page = sanitizePage(query.page);
   const limit = sanitizeLimit(query.limit);
   const sort_by = sanitizeSortBy(query.sort_by);
@@ -103,132 +111,126 @@ export const getTrips = async (userId, query) => {
   );
 
   const trips = await prisma.trip.findMany({
-    where: { userId, ...options.where },
+    where: { userId: user_id, ...options.where },
     skip: options.skip,
     take: options.take,
     orderBy: options.orderBy,
-    include: { days: true },
+    include: { days: true, markers: true },
   });
 
   const total = await prisma.trip.count({
-    where: { userId, ...options.where },
+    where: { userId: user_id, ...options.where },
   });
 
   return {
-    trips,
+    data: trips,
     pagination: {
-      totalItems: total,
-      currentPage: page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-      itemsPerPage: limit,
+      total_items: total,
+      current_page: page,
+      total_pages: Math.ceil(total / limit),
+      items_per_page: limit,
     },
   };
 };
 
-
-
-
-
-export const getTripById = async (userId, tripId) => {
+export const getTripById = async (user_id, trip_id) => {
   const trip = await prisma.trip.findFirst({
-    where: { id: tripId, userId },
-    include: { days: true },
+    where: { id: trip_id, userId: user_id },
+    include: { days: true, markers: true },
   });
+
   if (!trip) throw new CustomError("Trip not found", 404);
   return { data: trip };
 };
 
-export const updateTrip = async (userId, tripId, data, fileBuffer) => {
-  let imageUrl = data.imageUrl || null;
-  let publicId = data.publicId || null;
+export const updateTrip = async (user_id, trip_id, data, file_buffer) => {
+  let imageUrl = data.imageUrl ?? data.image_url ?? null;
+  let publicId = data.publicId ?? data.public_id ?? null;
 
-  // If a new image is provided, handle image replacement
-  if (fileBuffer) {
-    const optimizedBuffer = await optimizeImage(fileBuffer);
-    // Retrieve the current image's publicId from the database
-    const currentTrip = await prisma.trip.findUnique({
-      where: { id: tripId },
+  if (file_buffer) {
+    const optimizedBuffer = await optimizeImage(file_buffer);
+    const current_trip = await prisma.trip.findUnique({
+      where: { id: trip_id },
     });
 
-    // If a current image exists, delete it before uploading the new one
-    if (currentTrip?.publicId) {
+    if (current_trip?.publicId) {
       try {
-        await deleteImage(currentTrip.publicId);
-      } catch (error) {
-        console.error("Error deleting old image:", error);
-        // Optionally, you could decide whether to throw or continue with the new upload
+        await deleteImage(current_trip.publicId);
+      } catch (err) {
+        console.error("Error deleting old image:", err);
       }
     }
 
-    // Upload the new image and get the URL and public ID
     const uploaded = await uploadImage(optimizedBuffer, "trips");
     imageUrl = uploaded.url;
     publicId = uploaded.public_id;
   }
 
-  const { days, ...tripData } = data;
+  const { days, markers, ...trip_data } = data;
 
-  // Update the trip with the new image URL and public ID
-  const updatedTripCount = await prisma.trip.updateMany({
-    where: { id: tripId, userId },
+  const updated_count = await prisma.trip.updateMany({
+    where: { id: trip_id, userId: user_id },
     data: {
-      ...tripData,
+      ...trip_data,
       imageUrl,
       publicId,
     },
   });
 
-  if (!updatedTripCount.count) {
-    throw new CustomError("Trip not found", 404);
-  }
+  if (!updated_count.count) throw new CustomError("Trip not found", 404);
 
-  // Update the days if provided
   if (days) {
-    await prisma.day.deleteMany({ where: { tripId } });
+    await prisma.day.deleteMany({ where: { tripId: trip_id } });
     await prisma.day.createMany({
       data: days.map((d) => ({
-        tripId,
-        dayNumber: d.dayNumber,
+        tripId: trip_id,
+        dayNumber: d.dayNumber ?? d.day_number,
         notes: d.notes,
         cost: d.cost,
       })),
     });
   }
 
-  // Fetch the updated trip
-  const updatedTrip = await prisma.trip.findUnique({
-    where: { id: tripId },
-    include: { days: true },
-  });
-
-  return { data: updatedTrip };
-};
-
-
-export const deleteTrip = async (userId, tripId) => {
-  const trip = await prisma.trip.findFirst({
-    where: { id: tripId, userId },
-  });
-
-  if (!trip) {
-    throw new CustomError("Trip not found", 404);
+  if (markers) {
+    await prisma.marker.deleteMany({ where: { tripId: trip_id } });
+    const enrichedMarkers = await Promise.all(
+      markers.map(async (m) => ({
+        name: m.name,
+        lat: m.lat,
+        lon: m.lon,
+        address: m.address || null,
+        ...(await enrichLocationData(m.lat, m.lon)),
+      }))
+    );
+    await prisma.marker.createMany({
+      data: enrichedMarkers.map((m) => ({ ...m, tripId: trip_id })),
+    });
   }
 
-  // Delete image from Cloudinary if publicId exists
+  const updated_trip = await prisma.trip.findUnique({
+    where: { id: trip_id },
+    include: { days: true, markers: true },
+  });
+
+  return { data: updated_trip };
+};
+
+export const deleteTrip = async (user_id, trip_id) => {
+  const trip = await prisma.trip.findFirst({
+    where: { id: trip_id, userId: user_id },
+  });
+
+  if (!trip) throw new CustomError("Trip not found", 404);
+
   if (trip.publicId) {
     await deleteImage(trip.publicId);
   }
 
-  // Delete the trip record
   const deleted = await prisma.trip.deleteMany({
-    where: { id: tripId, userId },
+    where: { id: trip_id, userId: user_id },
   });
 
-  if (!deleted.count) {
-    throw new CustomError("Trip not found", 404);
-  }
+  if (!deleted.count) throw new CustomError("Trip not found", 404);
 
   return { data: "Trip deleted successfully" };
 };
-

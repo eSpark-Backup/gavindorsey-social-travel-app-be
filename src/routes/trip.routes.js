@@ -1,3 +1,4 @@
+// routes/trip.routes.js
 import express from "express";
 import {
   create,
@@ -5,10 +6,12 @@ import {
   getById,
   update,
   remove,
+  getMarkerDetails,
 } from "../controllers/trip.controller.js";
 import {
-  createTripSchema,
-  updateTripSchema,
+  createTripValidator,
+  updateTripValidator,
+  markerDetailsValidator,
 } from "../validators/trip.validator.js";
 import { validate } from "../middlewares/validate.js";
 import { authenticate } from "../middlewares/auth.js";
@@ -17,24 +20,41 @@ import { parseDaysMiddleware } from "../middlewares/parseDaysMiddleware.js";
 
 const router = express.Router();
 
+// All trip routes require authentication
 router.use(authenticate);
 
+// Create trip
 router.post(
   "/",
   upload.single("image"),
   parseDaysMiddleware,
-  validate(createTripSchema),
+  validate(createTripValidator, "body"),
   create
 );
+
+// List trips
 router.get("/", list);
+
+// Get trip by ID
 router.get("/:trip_id", getById);
+
+// Update trip
 router.put(
   "/:trip_id",
   upload.single("image"),
   parseDaysMiddleware,
-  validate(updateTripSchema),
+  validate(updateTripValidator, "body"),
   update
 );
+
+// Delete trip
 router.delete("/:trip_id", remove);
+
+// Get combined marker details (safety, weather, air quality)
+router.get(
+  "/marker/details",
+  validate(markerDetailsValidator, "query"),
+  getMarkerDetails
+);
 
 export { router as tripRoutes };

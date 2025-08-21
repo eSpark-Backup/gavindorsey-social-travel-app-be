@@ -1,3 +1,4 @@
+// controllers/trip.controller.js
 import {
   createTrip,
   getTrips,
@@ -7,94 +8,142 @@ import {
 } from "../services/trip.service.js";
 import { asyncWrapper } from "../utils/async_wrapper.js";
 import * as response from "../utils/response.js";
+import { getSafetyInfo } from "../services/safety.service.js";
+import { getWeatherInfo } from "../services/weather.service.js";
+import { getAirQualityInfo } from "../services/airquality.service.js";
+import { CustomError } from "../utils/custom_error.js";
 
+// Create trip
 const create = asyncWrapper(async (req, res) => {
-  const { start_date, end_date, location, budget, total_cost, days } = req.body;
+  const { startDate, endDate, location, budget, totalCost, days, markers } =
+    req.body;
 
-  const trip = await createTrip(
+  const formattedDays = days?.map((d) => ({
+    dayNumber: d.dayNumber,
+    notes: d.notes,
+    cost: d.cost,
+  }));
+
+  const formattedMarkers = markers?.map((m) => ({
+    name: m.name,
+    description: m.description || null,
+    lat: parseFloat(m.lat),
+    lon: parseFloat(m.lon),
+    address: m.address || null,
+  }));
+
+  const { data } = await createTrip(
     req.user.user_id,
     req.user.user_id,
     {
-      startDate: new Date(start_date),
-      endDate: new Date(end_date),
+      startDate: startDate ? new Date(startDate) : null,
+      endDate: endDate ? new Date(endDate) : null,
       location,
       budget,
-      totalCost: total_cost,
-      days: days?.map((d) => ({
-        dayNumber: d.day_number,
-        notes: d.notes,
-        cost: d.cost,
-      })),
+      totalCost,
+      days: formattedDays,
+      markers: formattedMarkers,
     },
     req.file?.buffer
   );
 
-  response.success(res, trip.data, "Trip created successfully");
+  response.success(res, data, "Trip created successfully");
 });
 
+// List trips
 const list = asyncWrapper(async (req, res) => {
-  const trips = await getTrips(req.user.user_id, req.query);
-  response.success(res, trips, "Trips fetched successfully");
+  const { data, pagination } = await getTrips(req.user.user_id, req.query);
+  response.success(
+    res,
+    { trips: data, pagination },
+    "Trips fetched successfully"
+  );
 });
 
-
-
-
-
-
-
-
-
+// Get trip by ID
 const getById = asyncWrapper(async (req, res) => {
   const { trip_id } = req.params;
-  const trip = await getTripById(req.user.user_id, trip_id);
-  response.success(res, trip.data, "Trip fetched successfully");
+  const { data } = await getTripById(req.user.user_id, trip_id);
+  response.success(res, data, "Trip fetched successfully");
 });
 
+// Update trip
 const update = asyncWrapper(async (req, res) => {
   const { trip_id } = req.params;
   const {
-    start_date,
-    end_date,
+    startDate,
+    endDate,
     location,
     budget,
-    total_cost,
+    totalCost,
     days,
-    old_public_id,
-    image_url,
+    markers,
+    imageUrl,
   } = req.body;
 
-  const result = await updateTrip(
+  const formattedDays = days?.map((d) => ({
+    dayNumber: d.dayNumber,
+    notes: d.notes,
+    cost: d.cost,
+  }));
+
+  const formattedMarkers = markers?.map((m) => ({
+    name: m.name,
+    description: m.description || null,
+    lat: parseFloat(m.lat),
+    lon: parseFloat(m.lon),
+    address: m.address || null,
+  }));
+
+  const { data } = await updateTrip(
     req.user.user_id,
     trip_id,
     {
-      imageUrl: image_url || null,
-      startDate: start_date ? new Date(start_date) : undefined,
-      endDate: end_date ? new Date(end_date) : undefined,
+      imageUrl: imageUrl || null,
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined,
       location,
       budget,
-      totalCost: total_cost,
-      days: days?.map((d) => ({
-        dayNumber: d.day_number,
-        notes: d.notes,
-        cost: d.cost,
-      })),
+      totalCost,
+      days: formattedDays,
+      markers: formattedMarkers,
     },
-    req.file?.buffer,
-    old_public_id
+    req.file?.buffer
   );
 
-  response.success(res, result.data, "Trip updated successfully");
+  response.success(res, data, "Trip updated successfully");
 });
 
+// Delete trip
 const remove = asyncWrapper(async (req, res) => {
   const { trip_id } = req.params;
-
-  const result = await deleteTrip(req.user.user_id, trip_id);
-
-  response.success(res, result.data, "Trip deleted successfully");
+  const { data } = await deleteTrip(req.user.user_id, trip_id);
+  response.success(res, data, "Trip deleted successfully");
 });
 
+// Get marker details
+const getMarkerDetails = asyncWrapper(async (req, res) => {
+  const { lat, lon } = req.query;
 
+  if (!lat || !lon) {
+    throw new CustomError(
+      "missing_coordinates",
+      400,
+      "Latitude and longitude are required"
+    );
+  }
 
-export { create, list, getById, update, remove };
+  const [safety_info, weather_info, air_quality_info] = await Promise.all([
+    getSafetyInfo(lat, lon),
+    getWeatherInfo(lat, lon),
+    getAirQualityInfo(lat, lon),
+  ]);
+
+  response.success(
+    res,
+    { safety_info, weather_info, air_quality_info },
+    "Marker details fetched successfully"
+  );
+});
+
+export { create, list, getById, update, remove, getMarkerDetails };

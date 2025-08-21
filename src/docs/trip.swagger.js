@@ -14,7 +14,7 @@
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/CreateTrip'
  *     responses:
@@ -28,7 +28,7 @@
  * @swagger
  * /api/trips:
  *   get:
- *     summary: Get all trips for the authenticated user
+ *     summary: Get paginated list of trips for the authenticated user
  *     tags: [Trips]
  *     parameters:
  *       - in: query
@@ -45,13 +45,13 @@
  *           default: 10
  *           minimum: 1
  *           maximum: 100
- *         description: Number of items per page (1-100)
+ *         description: Number of trips per page
  *       - in: query
  *         name: sort_by
  *         schema:
  *           type: string
- *           enum: [createdAt, startDate, endDate, location, budget, totalCost]
- *           default: createdAt
+ *           enum: [created_at, start_date, end_date, location, budget, total_cost]
+ *           default: created_at
  *         description: Field to sort by
  *       - in: query
  *         name: sort_order
@@ -64,13 +64,11 @@
  *         name: search
  *         schema:
  *           type: string
- *         description: Search keyword (filters by location)
+ *         description: Search by location keyword
  *     responses:
  *       200:
  *         description: Trips fetched successfully
  */
-
-
 
 /**
  * @swagger
@@ -108,7 +106,7 @@
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/UpdateTrip'
  *     responses:
