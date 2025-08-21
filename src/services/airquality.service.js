@@ -1,8 +1,7 @@
-// services/airquality.service.js
 import axios from "axios";
 import { CustomError } from "../utils/custom_error.js";
 
-const OPENWEATHERMAP_API_KEY = process.env.OPENWEATHERMAP_API_KEY;
+const OPENWEATHERMAP_CLIENT_API_KEY = process.env.OPENWEATHERMAP_CLIENT_API_KEY;
 const BASE_URL = "https://api.openweathermap.org/data/2.5/air_pollution";
 
 export const getAirQualityInfo = async (lat, lon) => {
@@ -15,7 +14,7 @@ export const getAirQualityInfo = async (lat, lon) => {
       params: {
         lat,
         lon,
-        appid: OPENWEATHERMAP_API_KEY,
+        appid: OPENWEATHERMAP_CLIENT_API_KEY,
       },
     });
 

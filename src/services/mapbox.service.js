@@ -2,7 +2,7 @@ import axiosInstance, { limiters } from "../config/axios.js";
 import { CustomError } from "../utils/custom_error.js";
 
 const MAPBOX_BASE = "https://api.mapbox.com";
-const MAPBOX_KEY = process.env.MAPBOX_API_KEY;
+const MAPBOX_CLIENT_API_KEY = process.env.MAPBOX_CLIENT_API_KEY;
 
 export const getCoordinatesFromAddress = async (address) => {
   if (!address) throw new CustomError("Address is required", 400);
@@ -13,7 +13,7 @@ export const getCoordinatesFromAddress = async (address) => {
         `${MAPBOX_BASE}/geocoding/v5/mapbox.places/${encodeURIComponent(
           address
         )}.json`,
-        { params: { access_token: MAPBOX_KEY, limit: 1 } }
+        { params: { access_token: MAPBOX_CLIENT_API_KEY, limit: 1 } }
       );
 
       if (!data?.features?.length) {
@@ -38,14 +38,13 @@ export const getCoordinatesFromAddress = async (address) => {
  * Reverse geocoding: coordinates -> place name
  */
 export const getAddressFromCoordinates = async (lat, lon) => {
-  if (!lat || !lon)
-    throw new CustomError("lat and lon are required", 400);
+  if (!lat || !lon) throw new CustomError("lat and lon are required", 400);
 
   return limiters.mapbox.schedule(async () => {
     try {
       const { data } = await axiosInstance.get(
         `${MAPBOX_BASE}/geocoding/v5/mapbox.places/${lon},${lat}.json`,
-        { params: { access_token: MAPBOX_KEY, limit: 1 } }
+        { params: { access_token: MAPBOX_CLIENT_API_KEY, limit: 1 } }
       );
 
       if (!data?.features?.length) {

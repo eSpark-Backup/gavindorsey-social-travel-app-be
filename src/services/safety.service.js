@@ -1,8 +1,8 @@
 import axiosInstance, { limiters } from "../config/axios.js";
 import { CustomError } from "../utils/custom_error.js";
 
-const TOMTOM_BASE = "https://api.tomtom.com";
-const TOMTOM_KEY = process.env.TOMTOM_API_KEY;
+const SAFETY_BASE = "https://api.tomtom.com";
+const SAFETY_CLIENT_API_KEY = process.env.SAFETY_CLIENT_API_KEY;
 
 export const getSafetyInfo = async (lat, lon) => {
   if (!lat || !lon)
@@ -11,8 +11,8 @@ export const getSafetyInfo = async (lat, lon) => {
   return limiters.tomtom.schedule(async () => {
     try {
       const { data } = await axiosInstance.get(
-        `${TOMTOM_BASE}/traffic/services/4/flowSegmentData/absolute/10/json`,
-        { params: { point: `${lat},${lon}`, key: TOMTOM_KEY } }
+        `${SAFETY_BASE}/traffic/services/4/flowSegmentData/absolute/10/json`,
+        { params: { point: `${lat},${lon}`, key: SAFETY_CLIENT_API_KEY } }
       );
 
       return {
