@@ -16,7 +16,7 @@ import {
 import { validate } from "../middlewares/validate.js";
 import { authenticate } from "../middlewares/auth.js";
 import { upload } from "../middlewares/upload.js";
-import { parseDaysMiddleware } from "../middlewares/parseDaysMiddleware.js";
+import { parseJsonArraysMiddleware } from "../middlewares/parseJsonArraysMiddleware.js";
 
 const router = express.Router();
 
@@ -27,7 +27,7 @@ router.use(authenticate);
 router.post(
   "/",
   upload.single("image"),
-  parseDaysMiddleware,
+  parseJsonArraysMiddleware,
   validate(createTripValidator, "body"),
   create
 );
@@ -42,7 +42,7 @@ router.get("/:trip_id", getById);
 router.put(
   "/:trip_id",
   upload.single("image"),
-  parseDaysMiddleware,
+  parseJsonArraysMiddleware,
   validate(updateTripValidator, "body"),
   update
 );

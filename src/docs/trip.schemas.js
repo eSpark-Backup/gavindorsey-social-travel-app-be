@@ -34,15 +34,16 @@
  *     CreateTrip:
  *       type: object
  *       required:
+ *         - title
  *         - startDate
  *         - endDate
  *         - location
  *         - budget
+ *         - image
  *       properties:
- *         imageUrl:
+ *         image:
  *           type: string
- *           format: uri
- *           example: "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+ *           format: binary
  *         startDate:
  *           type: string
  *           format: date
@@ -85,10 +86,9 @@
  *     UpdateTrip:
  *       type: object
  *       properties:
- *         imageUrl:
+ *         image:
  *           type: string
- *           format: uri
- *           example: "https://res.cloudinary.com/demo/image/upload/updated.jpg"
+ *           format: binary
  *         startDate:
  *           type: string
  *           format: date

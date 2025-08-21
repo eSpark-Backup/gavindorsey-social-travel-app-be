@@ -42,9 +42,9 @@ const enrichLocationData = async (lat, lon) => {
   ]);
 
   return {
-    safetyJson: safety || {},
-    weatherJson: weather || {},
-    airJson: airQuality || {},
+    safetyInfo: safety || {},
+    weatherInfo: weather || {},
+    airQualityInfo: airQuality || {},
   };
 };
 

@@ -14,7 +14,7 @@
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             $ref: '#/components/schemas/CreateTrip'
  *     responses:
@@ -106,7 +106,7 @@
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             $ref: '#/components/schemas/UpdateTrip'
  *     responses:
@@ -136,4 +136,47 @@
  *         description: Trip deleted successfully
  *       404:
  *         description: Trip not found
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreateTrip:
+ *       type: object
+ *       properties:
+ *         title:
+ *           type: string
+ *         location:
+ *           type: string
+ *         startDate:
+ *           type: string
+ *           format: date
+ *         endDate:
+ *           type: string
+ *           format: date
+ *         budget:
+ *           type: number
+ *         image:
+ *           type: string
+ *           format: binary
+ *
+ *     UpdateTrip:
+ *       type: object
+ *       properties:
+ *         title:
+ *           type: string
+ *         location:
+ *           type: string
+ *         startDate:
+ *           type: string
+ *           format: date
+ *         endDate:
+ *           type: string
+ *           format: date
+ *         budget:
+ *           type: number
+ *         image:
+ *           type: string
+ *           format: binary
  */

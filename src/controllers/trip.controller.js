@@ -1,4 +1,3 @@
-// controllers/trip.controller.js
 import {
   createTrip,
   getTrips,
@@ -15,8 +14,16 @@ import { CustomError } from "../utils/custom_error.js";
 
 // Create trip
 const create = asyncWrapper(async (req, res) => {
-  const { startDate, endDate, location, budget, totalCost, days, markers } =
-    req.body;
+  const {
+    title,
+    startDate,
+    endDate,
+    location,
+    budget,
+    totalCost,
+    days,
+    markers,
+  } = req.body;
 
   const formattedDays = days?.map((d) => ({
     dayNumber: d.dayNumber,
@@ -36,6 +43,7 @@ const create = asyncWrapper(async (req, res) => {
     req.user.userId,
     req.user.userId,
     {
+      title,
       startDate: startDate ? new Date(startDate) : null,
       endDate: endDate ? new Date(endDate) : null,
       location,
@@ -71,6 +79,7 @@ const getById = asyncWrapper(async (req, res) => {
 const update = asyncWrapper(async (req, res) => {
   const { tripId } = req.params;
   const {
+    title,
     startDate,
     endDate,
     location,
@@ -99,6 +108,7 @@ const update = asyncWrapper(async (req, res) => {
     req.user.userId,
     tripId,
     {
+      title,
       imageUrl: imageUrl || null,
       startDate: startDate ? new Date(startDate) : undefined,
       endDate: endDate ? new Date(endDate) : undefined,

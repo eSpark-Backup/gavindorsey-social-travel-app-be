@@ -13,6 +13,7 @@ const markerSchema = Joi.object({
 });
 
 export const createTripValidator = Joi.object({
+  title: Joi.string().min(2).max(100).required(),
   imageUrl: Joi.string().uri().optional(),
   startDate: Joi.date().iso().required(),
   endDate: Joi.date().iso().min(Joi.ref("startDate")).required(),
@@ -24,6 +25,7 @@ export const createTripValidator = Joi.object({
 });
 
 export const updateTripValidator = Joi.object({
+  title: Joi.string().min(2).max(100).optional(),
   imageUrl: Joi.string().uri().optional(),
   startDate: Joi.date().iso().optional(),
   endDate: Joi.date().iso().min(Joi.ref("startDate")).when("startDate", {
