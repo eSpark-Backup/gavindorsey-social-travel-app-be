@@ -131,6 +131,17 @@
  *                 type: array
  *                 items:
  *                   $ref: '#/components/schemas/TripMarker'
+ *                 example:
+ *                   - name: "Eiffel Tower"
+ *                     lat: 48.8584
+ *                     lon: 2.2945
+ *                     address: "Address of a location"
+ *                     description: "Description about the location"
+ *                   - name: "Louvre Museum"
+ *                     lat: 48.8606
+ *                     lon: 2.3376
+ *                     address: "Another address"
+ *                     description: "Another description"
  *     responses:
  *       200:
  *         description: Markers placed successfully

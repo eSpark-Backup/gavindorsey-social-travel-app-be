@@ -87,6 +87,11 @@
  *               lon: 2.2945
  *               address: "Address of a location"
  *               description: "Description about the location"
+ *             - name: "Louvre Museum"
+ *               lat: 48.8606
+ *               lon: 2.3376
+ *               address: "Another address"
+ *               description: "Another description"
  *
  *     UpdateTrip:
  *       type: object
@@ -133,6 +138,11 @@
  *               lon: 12.4922
  *               address: "Address of a location"
  *               description: "Description of a location"
+ *             - name: "Trevi Fountain"
+ *               lat: 41.9009
+ *               lon: 12.4833
+ *               address: "Another address"
+ *               description: "Another description"
  *
  *     PlaceMarker:
  *       type: object
