@@ -37,7 +37,6 @@
  *           type: integer
  *           default: 1
  *           minimum: 1
- *         description: Page number (minimum 1)
  *       - in: query
  *         name: limit
  *         schema:
@@ -45,26 +44,22 @@
  *           default: 10
  *           minimum: 1
  *           maximum: 100
- *         description: Number of trips per page
  *       - in: query
  *         name: sort_by
  *         schema:
  *           type: string
  *           enum: [createdAt, startDate, endDate, budget, totalCost]
  *           default: createdAt
- *         description: Field to sort by
  *       - in: query
  *         name: sort_order
  *         schema:
  *           type: string
  *           enum: [asc, desc]
  *           default: desc
- *         description: Sort order
  *       - in: query
  *         name: search
  *         schema:
  *           type: string
- *         description: Search by location
  *     responses:
  *       200:
  *         description: Trips fetched successfully
@@ -73,36 +68,26 @@
 /**
  * @swagger
  * /api/trips/{tripId}:
+ *   parameters:
+ *     - in: path
+ *       name: tripId
+ *       required: true
+ *       schema:
+ *         type: string
+ *       description: Trip ID
+ *
  *   get:
  *     summary: Get trip details by ID
  *     tags: [Trips]
- *     parameters:
- *       - in: path
- *         name: tripId
- *         required: true
- *         schema:
- *           type: string
- *         description: Trip ID
  *     responses:
  *       200:
  *         description: Trip fetched successfully
  *       404:
  *         description: Trip not found
- */
-
-/**
- * @swagger
- * /api/trips/{tripId}:
+ *
  *   put:
  *     summary: Update an existing trip
  *     tags: [Trips]
- *     parameters:
- *       - in: path
- *         name: tripId
- *         required: true
- *         schema:
- *           type: string
- *         description: Trip ID
  *     requestBody:
  *       required: true
  *       content:
@@ -116,21 +101,10 @@
  *         description: Validation error
  *       404:
  *         description: Trip not found
- */
-
-/**
- * @swagger
- * /api/trips/{tripId}:
+ *
  *   delete:
  *     summary: Delete a trip
  *     tags: [Trips]
- *     parameters:
- *       - in: path
- *         name: tripId
- *         required: true
- *         schema:
- *           type: string
- *         description: Trip ID
  *     responses:
  *       200:
  *         description: Trip deleted successfully
@@ -140,39 +114,29 @@
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     CreateTrip:
- *       type: object
- *       properties:
- *         title:
- *           type: string
- *         startDate:
- *           type: string
- *           format: date
- *         endDate:
- *           type: string
- *           format: date
- *         budget:
- *           type: number
- *         image:
- *           type: string
- *           format: binary
- *
- *     UpdateTrip:
- *       type: object
- *       properties:
- *         title:
- *           type: string
- *         startDate:
- *           type: string
- *           format: date
- *         endDate:
- *           type: string
- *           format: date
- *         budget:
- *           type: number
- *         image:
- *           type: string
- *           format: binary
+ * /api/trips/marker/place:
+ *   post:
+ *     summary: Place markers on a trip map (with or without search)
+ *     tags: [Trips]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tripId:
+ *                 type: string
+ *                 example: "123e4567-e89b-12d3-a456-426614174000"
+ *               markers:
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/TripMarker'
+ *     responses:
+ *       200:
+ *         description: Markers placed successfully
+ *       400:
+ *         description: Validation error
+ *       404:
+ *         description: Trip not found
  */

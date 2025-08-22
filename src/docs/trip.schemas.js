@@ -124,4 +124,28 @@
  *               lon: 12.4922
  *               address: "Address of a location"
  *               description: "Description of a location"
+ *
+ *     PlaceMarker:
+ *       type: object
+ *       required:
+ *         - lat
+ *         - lon
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: "Custom Marker"
+ *         lat:
+ *           type: number
+ *           format: float
+ *           example: 40.7128
+ *         lon:
+ *           type: number
+ *           format: float
+ *           example: -74.006
+ *         address:
+ *           type: string
+ *           example: "New York, USA"
+ *         description:
+ *           type: string
+ *           example: "Marker added by clicking on the map"
  */
