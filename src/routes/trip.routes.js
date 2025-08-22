@@ -1,4 +1,3 @@
-// routes/trip.routes.js
 import express from "express";
 import {
   create,
@@ -7,11 +6,13 @@ import {
   update,
   remove,
   getMarkerDetails,
+  placeMarker,
 } from "../controllers/trip.controller.js";
 import {
   createTripValidator,
   updateTripValidator,
   markerDetailsValidator,
+  placeMarkerValidator,
 } from "../validators/trip.validator.js";
 import { validate } from "../middlewares/validate.js";
 import { authenticate } from "../middlewares/auth.js";
@@ -35,6 +36,19 @@ router.post(
 // List trips
 router.get("/", list);
 
+router.post(
+  "/marker/place",
+  validate(placeMarkerValidator, "body"),
+  placeMarker
+);
+
+// Get combined marker details (safety, weather, air quality)
+router.get(
+  "/marker/details",
+  validate(markerDetailsValidator, "query"),
+  getMarkerDetails
+);
+
 // Get trip by ID
 router.get("/:trip_id", getById);
 
@@ -49,12 +63,5 @@ router.put(
 
 // Delete trip
 router.delete("/:trip_id", remove);
-
-// Get combined marker details (safety, weather, air quality)
-router.get(
-  "/marker/details",
-  validate(markerDetailsValidator, "query"),
-  getMarkerDetails
-);
 
 export { router as tripRoutes };

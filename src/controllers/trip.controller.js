@@ -145,4 +145,36 @@ const getMarkerDetails = asyncWrapper(async (req, res) => {
   );
 });
 
-export { create, list, getById, update, remove, getMarkerDetails };
+const placeMarker = asyncWrapper(async (req, res) => {
+  const { address, lat, lon } = req.body;
+
+  let markerLat, markerLon, name;
+
+  if (address) {
+    const coords = await getCoordinatesFromAddress(address);
+    markerLat = coords.lat;
+    markerLon = coords.lon;
+    name = coords.name;
+  } else if (lat !== undefined && lon !== undefined) {
+    markerLat = parseFloat(lat);
+    markerLon = parseFloat(lon);
+    name = null;
+  } else {
+    throw new CustomError("Provide either an address or lat/lon", 400);
+  }
+
+  const enrichedData = await enrichLocationData(markerLat, markerLon);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      lat: markerLat,
+      lon: markerLon,
+      name,
+      ...enrichedData,
+    },
+    message: "Marker placed successfully",
+  });
+});
+
+export { create, list, getById, update, remove, getMarkerDetails, placeMarker };

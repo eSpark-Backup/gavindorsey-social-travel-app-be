@@ -45,3 +45,17 @@ export const markerDetailsValidator = Joi.object({
   lat: Joi.number().min(-90).max(90).required(),
   lon: Joi.number().min(-180).max(180).required(),
 });
+
+export const placeMarkerValidator = Joi.object({
+  address: Joi.string().trim().optional(),
+  lat: Joi.number().min(-90).max(90).when("address", {
+    is: Joi.exist(),
+    then: Joi.optional(),
+    otherwise: Joi.required(),
+  }),
+  lon: Joi.number().min(-180).max(180).when("address", {
+    is: Joi.exist(),
+    then: Joi.optional(),
+    otherwise: Joi.required(),
+  }),
+}).or("address", "lat"); // Require at least address or lat/lon
