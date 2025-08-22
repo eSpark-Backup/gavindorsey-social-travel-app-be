@@ -30,6 +30,12 @@
  *           type: number
  *           format: float
  *           example: 2.2945
+ *         address:
+ *           type: string
+ *           example: "Address of a location"
+ *         description:
+ *           type: string
+ *           example: "Description about the location"
  *
  *     CreateTrip:
  *       type: object
@@ -38,8 +44,9 @@
  *         - startDate
  *         - endDate
  *         - budget
- *         - image
  *       properties:
+ *         title:
+ *           type: string
  *         image:
  *           type: string
  *           format: binary
@@ -84,6 +91,8 @@
  *     UpdateTrip:
  *       type: object
  *       properties:
+ *         title:
+ *           type: string
  *         image:
  *           type: string
  *           format: binary
@@ -137,14 +146,14 @@
  *         lat:
  *           type: number
  *           format: float
- *           example: 40.7128
+ *           example: 24.8607
  *         lon:
  *           type: number
  *           format: float
- *           example: -74.006
+ *           example: 67.0011
  *         address:
  *           type: string
- *           example: "New York, USA"
+ *           example: "Karachi, Pakistan"
  *         description:
  *           type: string
  *           example: "Marker added by clicking on the map"

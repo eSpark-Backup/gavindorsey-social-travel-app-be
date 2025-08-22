@@ -2,24 +2,38 @@ import { CustomError } from "../utils/custom_error.js";
 
 const parseJsonArraysMiddleware = (req, res, next) => {
   try {
-    if (req.body.days && typeof req.body.days === "string") {
-      req.body.days = JSON.parse(req.body.days);
-      if (!Array.isArray(req.body.days)) {
-        throw new Error('"days" must be an array');
+    const normalizeToArray = (value, key) => {
+      if (!value) return value;
+
+      // If passed as string, try parsing
+      if (typeof value === "string") {
+        value = JSON.parse(value);
       }
+
+      // Wrap single object into array
+      if (!Array.isArray(value)) {
+        value = [value];
+      }
+
+      return value;
+    };
+
+    if (req.body.days) {
+      req.body.days = normalizeToArray(req.body.days, "days");
     }
 
-    if (req.body.markers && typeof req.body.markers === "string") {
-      req.body.markers = JSON.parse(req.body.markers);
-      if (!Array.isArray(req.body.markers)) {
-        throw new Error('"markers" must be an array');
-      }
+    if (req.body.markers) {
+      req.body.markers = normalizeToArray(req.body.markers, "markers");
     }
 
     next();
   } catch (err) {
     next(
-      new CustomError(err.message || "Invalid JSON in days or markers", 422)
+      new CustomError(
+        "parsing_error",
+        422,
+        err.message || "Invalid JSON in days or markers"
+      )
     );
   }
 };

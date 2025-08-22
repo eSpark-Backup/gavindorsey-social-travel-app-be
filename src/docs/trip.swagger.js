@@ -1,8 +1,8 @@
 /**
  * @swagger
  * tags:
- *   name: Trips
- *   description: Trip management endpoints
+ *   - name: Trips
+ *     description: Trip management endpoints
  */
 
 /**
@@ -22,11 +22,7 @@
  *         description: Trip created successfully
  *       400:
  *         description: Validation error
- */
-
-/**
- * @swagger
- * /api/trips:
+ *
  *   get:
  *     summary: Get paginated list of trips for the authenticated user
  *     tags: [Trips]
@@ -124,6 +120,9 @@
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - tripId
+ *               - markers
  *             properties:
  *               tripId:
  *                 type: string

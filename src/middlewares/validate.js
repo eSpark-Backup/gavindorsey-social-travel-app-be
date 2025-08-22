@@ -5,7 +5,9 @@ const validate = (schema) => (req, res, next) => {
 
   if (error) {
     const message = error.details.map((d) => d.message).join(", ");
-    return next(new CustomError(message, 422));
+    return next(
+      new CustomError("validation_error", 422, message, error.details)
+    );
   }
 
   next();

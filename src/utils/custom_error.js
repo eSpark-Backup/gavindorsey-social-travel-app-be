@@ -1,27 +1,32 @@
-class CustomError extends Error {
+export class CustomError extends Error {
   constructor(
-    code,
-    statusCode = 400,
-    message = "An error occurred",
+    code = "internal_error",
+    statusCode = 500,
+    message,
     details = {}
   ) {
-    super(message);
-    this.code = code || "internal_error";
+    // Fallback message based on status
+    const defaultMessage =
+      {
+        400: "Bad request",
+        401: "Unauthorized",
+        403: "Forbidden",
+        404: "Resource not found",
+        422: "Unprocessable entity",
+        500: "Internal server error",
+      }[statusCode] || "An error occurred";
+
+    super(message || defaultMessage);
+
+    this.code = code;
     this.statusCode = statusCode;
     this.details = details;
 
     Error.captureStackTrace(this, this.constructor);
   }
 
-  /**
-   * Handles axios or HTTP errors and wraps them in CustomError
-   * @param {Error} err
-   * @param {string} fallbackMessage
-   * @returns {CustomError}
-   */
   static handleAxiosError(err, fallbackMessage = "Request failed") {
     if (err.response) {
-      // Server responded with a status outside 2xx
       return new CustomError(
         err.response.data?.code || "external_service_error",
         err.response.status,
@@ -29,7 +34,6 @@ class CustomError extends Error {
         { responseData: err.response.data }
       );
     } else if (err.request) {
-      // Request made but no response received
       return new CustomError(
         "no_response",
         504,
@@ -37,7 +41,6 @@ class CustomError extends Error {
         { request: err.config }
       );
     } else {
-      // Something happened before sending the request
       return new CustomError(
         "request_setup_error",
         500,
@@ -46,5 +49,3 @@ class CustomError extends Error {
     }
   }
 }
-
-export { CustomError };
