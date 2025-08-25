@@ -6,6 +6,7 @@ import { buildQueryOptions } from "../utils/queryHelper.js";
 import { getSafetyInfo } from "./safety.service.js";
 import { getWeatherInfo } from "./weather.service.js";
 import { getAirQualityInfo } from "./airquality.service.js";
+import { getCoordinatesFromAddress } from "./mapbox.service.js";
 
 const VALID_SORT_FIELDS = [
   "createdAt",
@@ -235,14 +236,20 @@ export const deleteTrip = async (userId, tripId) => {
   return { data: "Trip deleted successfully" };
 };
 
-export const processMarker = async ({ address, lat, lon, name }) => {
+const processSingleMarker = async ({
+  address,
+  lat,
+  lon,
+  name,
+  description,
+}) => {
   let markerLat, markerLon, resolvedName;
 
   if (address) {
     const coords = await getCoordinatesFromAddress(address);
     markerLat = coords.lat;
     markerLon = coords.lon;
-    resolvedName = coords.name;
+    resolvedName = coords.name || name || null;
   } else if (lat !== undefined && lon !== undefined) {
     markerLat = parseFloat(lat);
     markerLon = parseFloat(lon);
@@ -257,6 +264,12 @@ export const processMarker = async ({ address, lat, lon, name }) => {
     lat: markerLat,
     lon: markerLon,
     name: resolvedName,
+    description: description || null,
     ...enrichedData,
   };
 };
+
+export const processMarkers = async (markers) => {
+  return Promise.all(markers.map((m) => processSingleMarker(m)));
+};
+

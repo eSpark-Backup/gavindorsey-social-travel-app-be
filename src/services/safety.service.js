@@ -1,5 +1,7 @@
 import axiosInstance, { limiters } from "../config/axios.js";
 import { CustomError } from "../utils/custom_error.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const BASE_URL = "https://api.tomtom.com";
 const SAFETY_CLIENT_API_KEY = process.env.SAFETY_CLIENT_API_KEY;

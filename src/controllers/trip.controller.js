@@ -4,7 +4,7 @@ import {
   getTripById,
   updateTrip,
   deleteTrip,
-  processMarker
+  processMarkers
 } from "../services/trip.service.js";
 import { asyncWrapper } from "../utils/async_wrapper.js";
 import * as response from "../utils/response.js";
@@ -147,14 +147,18 @@ const getMarkerDetails = asyncWrapper(async (req, res) => {
 });
 
 const placeMarker = asyncWrapper(async (req, res) => {
-  const marker = await processMarker(req.body);
+  const { tripId, markers } = req.body;
+
+  // always array because of validator
+  const processedMarkers = await processMarkers(markers);
 
   res.status(200).json({
     success: true,
-    data: marker,
-    message: "Marker placed successfully",
+    data: processedMarkers,
+    message: "Markers placed successfully",
   });
 });
+
 
 
 export { create, list, getById, update, remove, getMarkerDetails, placeMarker };

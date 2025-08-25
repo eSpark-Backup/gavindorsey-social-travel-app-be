@@ -1,5 +1,7 @@
 import axiosInstance, { limiters } from "../config/axios.js";
 import { CustomError } from "../utils/custom_error.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const BASE_URL = "https://api.mapbox.com";
 const MAPBOX_CLIENT_SECRET_TOKEN = process.env.MAPBOX_CLIENT_SECRET_TOKEN;
@@ -9,8 +11,7 @@ export const getCoordinatesFromAddress = async (address) => {
 
   return limiters.mapbox.schedule(async () => {
     try {
-      const { data } = await axiosInstance.get
-      dotenv(
+      const { data } = await axiosInstance.get(
         `${BASE_URL}/geocoding/v5/mapbox.places/${encodeURIComponent(
           address
         )}.json`,
@@ -43,8 +44,7 @@ export const getAddressFromCoordinates = async (lat, lon) => {
 
   return limiters.mapbox.schedule(async () => {
     try {
-      const { data } = await axiosInstance
-      dotenv.get(
+      const { data } = await axiosInstance.get(
         `${BASE_URL}/geocoding/v5/mapbox.places/${lon},${lat}.json`,
         { params: { access_token: MAPBOX_CLIENT_SECRET_TOKEN, limit: 1 } }
       );
