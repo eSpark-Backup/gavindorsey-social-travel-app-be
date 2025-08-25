@@ -143,8 +143,8 @@ export const getTripById = async (userId, tripId) => {
 };
 
 export const updateTrip = async (userId, tripId, data, file_buffer) => {
-  let imageUrl = data.imageUrl ?? data.imageUrl ?? null;
-  let publicId = data.publicId ?? data.publicId ?? null;
+  let imageUrl = data.imageUrl ?? null;
+  let publicId = data.publicId ?? null;
 
   if (file_buffer) {
     const optimizedBuffer = await optimizeImage(file_buffer);
@@ -233,4 +233,30 @@ export const deleteTrip = async (userId, tripId) => {
   if (!deleted.count) throw new CustomError("Trip not found", 404);
 
   return { data: "Trip deleted successfully" };
+};
+
+export const processMarker = async ({ address, lat, lon, name }) => {
+  let markerLat, markerLon, resolvedName;
+
+  if (address) {
+    const coords = await getCoordinatesFromAddress(address);
+    markerLat = coords.lat;
+    markerLon = coords.lon;
+    resolvedName = coords.name;
+  } else if (lat !== undefined && lon !== undefined) {
+    markerLat = parseFloat(lat);
+    markerLon = parseFloat(lon);
+    resolvedName = name || null;
+  } else {
+    throw new CustomError("Provide either an address or lat/lon", 400);
+  }
+
+  const enrichedData = await enrichLocationData(markerLat, markerLon);
+
+  return {
+    lat: markerLat,
+    lon: markerLon,
+    name: resolvedName,
+    ...enrichedData,
+  };
 };

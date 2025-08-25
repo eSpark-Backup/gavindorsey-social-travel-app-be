@@ -4,6 +4,7 @@ import {
   getTripById,
   updateTrip,
   deleteTrip,
+  processMarker
 } from "../services/trip.service.js";
 import { asyncWrapper } from "../utils/async_wrapper.js";
 import * as response from "../utils/response.js";
@@ -146,35 +147,14 @@ const getMarkerDetails = asyncWrapper(async (req, res) => {
 });
 
 const placeMarker = asyncWrapper(async (req, res) => {
-  const { address, lat, lon } = req.body;
-
-  let markerLat, markerLon, name;
-
-  if (address) {
-    const coords = await getCoordinatesFromAddress(address);
-    markerLat = coords.lat;
-    markerLon = coords.lon;
-    name = coords.name;
-  } else if (lat !== undefined && lon !== undefined) {
-    markerLat = parseFloat(lat);
-    markerLon = parseFloat(lon);
-    name = null;
-  } else {
-    throw new CustomError("Provide either an address or lat/lon", 400);
-  }
-
-  const enrichedData = await enrichLocationData(markerLat, markerLon);
+  const marker = await processMarker(req.body);
 
   res.status(200).json({
     success: true,
-    data: {
-      lat: markerLat,
-      lon: markerLon,
-      name,
-      ...enrichedData,
-    },
+    data: marker,
     message: "Marker placed successfully",
   });
 });
+
 
 export { create, list, getById, update, remove, getMarkerDetails, placeMarker };

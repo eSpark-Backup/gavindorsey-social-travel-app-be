@@ -11,6 +11,8 @@
  *   post:
  *     summary: Create a new trip
  *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -26,6 +28,8 @@
  *   get:
  *     summary: Get paginated list of trips for the authenticated user
  *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -64,6 +68,8 @@
 /**
  * @swagger
  * /api/trips/{tripId}:
+ *   security:
+ *     - bearerAuth: []
  *   parameters:
  *     - in: path
  *       name: tripId
@@ -75,6 +81,8 @@
  *   get:
  *     summary: Get trip details by ID
  *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Trip fetched successfully
@@ -84,6 +92,8 @@
  *   put:
  *     summary: Update an existing trip
  *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -101,6 +111,8 @@
  *   delete:
  *     summary: Delete a trip
  *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Trip deleted successfully
@@ -114,6 +126,8 @@
  *   post:
  *     summary: Place markers on a trip map (with or without search)
  *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

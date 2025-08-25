@@ -47,15 +47,26 @@ export const markerDetailsValidator = Joi.object({
 });
 
 export const placeMarkerValidator = Joi.object({
-  address: Joi.string().trim().optional(),
-  lat: Joi.number().min(-90).max(90).when("address", {
-    is: Joi.exist(),
-    then: Joi.optional(),
-    otherwise: Joi.required(),
-  }),
-  lon: Joi.number().min(-180).max(180).when("address", {
-    is: Joi.exist(),
-    then: Joi.optional(),
-    otherwise: Joi.required(),
-  }),
-}).or("address", "lat"); // Require at least address or lat/lon
+  tripId: Joi.string().uuid().required(),
+  markers: Joi.array()
+    .items(
+      Joi.object({
+        name: Joi.string().trim().optional(),
+        address: Joi.string().trim().optional(),
+        lat: Joi.number().min(-90).max(90).when("address", {
+          is: Joi.exist(),
+          then: Joi.optional(),
+          otherwise: Joi.required(),
+        }),
+        lon: Joi.number().min(-180).max(180).when("address", {
+          is: Joi.exist(),
+          then: Joi.optional(),
+          otherwise: Joi.required(),
+        }),
+        description: Joi.string().trim().optional(),
+      }).or("address", "lat")
+    )
+    .min(1)
+    .required(),
+});
+

@@ -50,11 +50,11 @@ router.get(
 );
 
 // Get trip by ID
-router.get("/:trip_id", getById);
+router.get("/:tripId", getById);
 
 // Update trip
 router.put(
-  "/:trip_id",
+  "/:tripId",
   upload.single("image"),
   parseJsonArraysMiddleware,
   validate(updateTripValidator, "body"),
@@ -62,6 +62,6 @@ router.put(
 );
 
 // Delete trip
-router.delete("/:trip_id", remove);
+router.delete("/:tripId", remove);
 
 export { router as tripRoutes };
